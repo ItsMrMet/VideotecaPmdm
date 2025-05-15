@@ -1,7 +1,7 @@
 package com.thomasvaneemeren.videotecapmdm.data.repository
 
-import com.thomasvaneemeren.videotecapmdm.model.Movie
-import com.thomasvaneemeren.videotecapmdm.model.MovieEntity
+import com.thomasvaneemeren.videotecapmdm.data.model.Movie
+import com.thomasvaneemeren.videotecapmdm.data.model.MovieEntity
 import kotlinx.coroutines.flow.Flow
 
 interface MovieRepository {

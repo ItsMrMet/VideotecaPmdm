@@ -5,7 +5,7 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.thomasvaneemeren.videotecapmdm.data.database.dao.MovieDao
-import com.thomasvaneemeren.videotecapmdm.model.Movie
+import com.thomasvaneemeren.videotecapmdm.data.model.Movie
 
 @Database(entities = [Movie::class], version = 1, exportSchema = false)
 abstract class VideotecaDatabase : RoomDatabase() {
