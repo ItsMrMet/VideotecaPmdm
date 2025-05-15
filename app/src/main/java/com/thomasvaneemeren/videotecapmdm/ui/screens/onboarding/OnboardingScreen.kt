@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.thomasvaneemeren.videotecapmdm.ui.viewmodels.OnboardingViewModel
 import kotlinx.coroutines.launch
 
 @Composable
@@ -18,46 +19,31 @@ fun OnboardingScreen(
     navController: NavController,
     viewModel: OnboardingViewModel = hiltViewModel()
 ) {
-    var username by remember { mutableStateOf("") }
-    val scope = rememberCoroutineScope()
+    var inputName by remember { mutableStateOf("") }
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(32.dp),
+        modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Icon(
-            imageVector = Icons.Default.Movie,
-            contentDescription = "Logo",
-            modifier = Modifier.size(100.dp),
-            tint = MaterialTheme.colorScheme.primary
+        Text(text = "Bienvenido, por favor ingresa tu nombre")
+        TextField(
+            value = inputName,
+            onValueChange = { inputName = it },
+            label = { Text("Nombre") }
         )
-        Spacer(modifier = Modifier.height(24.dp))
-
-        OutlinedTextField(
-            value = username,
-            onValueChange = { username = it },
-            label = { Text("Tu nombre de usuario") },
-            singleLine = true,
-            modifier = Modifier.fillMaxWidth()
-        )
-        Spacer(modifier = Modifier.height(32.dp))
-
+        Spacer(modifier = Modifier.height(16.dp))
         Button(
             onClick = {
-                scope.launch { // Añade el scope.launch aquí
-                    viewModel.saveUsername(username)
+                if (inputName.isNotBlank()) {
+                    viewModel.saveUserName(inputName.trim())
                     navController.navigate("main") {
                         popUpTo("onboarding") { inclusive = true }
                     }
                 }
-            },
-            enabled = username.isNotBlank(),
-            modifier = Modifier.width(200.dp)
+            }
         ) {
-            Text("Continuar")
+            Text("Guardar y continuar")
         }
     }
 }

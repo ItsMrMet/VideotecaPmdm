@@ -6,11 +6,6 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
 import com.thomasvaneemeren.videotecapmdm.data.database.DatabaseFactory
 import com.thomasvaneemeren.videotecapmdm.data.datastore.UserPreferencesRepository
-import com.thomasvaneemeren.videotecapmdm.data.database.VideotecaDatabase
-import com.thomasvaneemeren.videotecapmdm.data.database.dao.MovieDao
-import com.thomasvaneemeren.videotecapmdm.data.repository.MovieRepository
-import com.thomasvaneemeren.videotecapmdm.data.repository.MovieRepositoryImpl
-import com.thomasvaneemeren.videotecapmdm.repository.MovieRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
