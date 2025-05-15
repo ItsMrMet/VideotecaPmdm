@@ -5,19 +5,20 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
+import com.thomasvaneemeren.videotecapmdm.model.Movie
 import com.thomasvaneemeren.videotecapmdm.model.MovieEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface MovieDao {
     @Insert
-    suspend fun insertMovie(movie: MovieEntity)
+    suspend fun insertMovie(movie: Movie)
 
     @Update
-    suspend fun updateMovie(movie: MovieEntity)
+    suspend fun updateMovie(movie: Movie)
 
     @Delete
-    suspend fun deleteMovie(movie: MovieEntity)
+    suspend fun deleteMovie(movie: Movie)
 
     @Query("SELECT * FROM movies WHERE userId = :userId")
     fun getAllMovies(userId: String): Flow<List<MovieEntity>>
