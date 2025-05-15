@@ -6,19 +6,18 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface MovieDao {
-
-    @Query("SELECT * FROM movies WHERE userId = :userId ORDER BY title ASC")
-    fun getAllMovies(userId: String): Flow<List<MovieEntity>>
+    @Query("SELECT * FROM movies WHERE userId = :userId")
+    fun getMoviesByUser(userId: String): Flow<List<MovieEntity>>
 
     @Query("SELECT * FROM movies WHERE id = :id AND userId = :userId LIMIT 1")
     suspend fun getMovieById(id: Int, userId: String): MovieEntity?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertMovie(movie: MovieEntity)
+    suspend fun insert(movie: MovieEntity)
 
     @Update
-    suspend fun updateMovie(movie: MovieEntity)
+    suspend fun update(movie: MovieEntity)
 
     @Delete
-    suspend fun deleteMovie(movie: MovieEntity)
+    suspend fun delete(movie: MovieEntity)
 }

@@ -14,5 +14,5 @@ data class MovieEntity(
     val duration: Int,
     val director: String,
     val isFavorite: Boolean,
-    val userId: String // Este campo para identificar el usuario dueño
+    val userId: String
 )
