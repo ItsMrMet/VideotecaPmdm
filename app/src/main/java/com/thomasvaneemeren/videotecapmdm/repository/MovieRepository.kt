@@ -1,4 +1,4 @@
-package com.thomasvaneemeren.videotecapmdm.data.repository
+package com.thomasvaneemeren.videotecapmdm.repository
 
 import com.thomasvaneemeren.videotecapmdm.data.model.Movie
 import com.thomasvaneemeren.videotecapmdm.data.model.MovieEntity
