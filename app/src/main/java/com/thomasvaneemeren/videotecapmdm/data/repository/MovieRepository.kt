@@ -1,0 +1,12 @@
+package com.thomasvaneemeren.videotecapmdm.data.repository
+
+import com.thomasvaneemeren.videotecapmdm.model.Movie
+import kotlinx.coroutines.flow.Flow
+
+interface MovieRepository {
+    fun getAllMovies(userId: String): Flow<List<Movie>>
+    fun getMoviesByUser(userId: String): Flow<List<Movie>>
+    suspend fun insert(movie: Movie)
+    suspend fun update(movie: Movie)
+    suspend fun delete(movie: Movie)
+}
