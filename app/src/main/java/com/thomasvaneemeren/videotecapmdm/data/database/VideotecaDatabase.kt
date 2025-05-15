@@ -5,9 +5,9 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.thomasvaneemeren.videotecapmdm.data.database.dao.MovieDao
-import com.thomasvaneemeren.videotecapmdm.data.model.Movie
+import com.thomasvaneemeren.videotecapmdm.data.entities.MovieEntity
 
-@Database(entities = [Movie::class], version = 1, exportSchema = false)
+@Database(entities = [MovieEntity::class], version = 1, exportSchema = false)
 abstract class VideotecaDatabase : RoomDatabase() {
 
     abstract fun movieDao(): MovieDao
@@ -16,15 +16,13 @@ abstract class VideotecaDatabase : RoomDatabase() {
         @Volatile
         private var INSTANCE: VideotecaDatabase? = null
 
-        fun getInstance(context: Context, username: String): VideotecaDatabase {
+        fun getInstance(context: Context, dbName: String): VideotecaDatabase {
             return INSTANCE ?: synchronized(this) {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     VideotecaDatabase::class.java,
-                    "videoteca_db_$username" // Base diferente por usuario
-                )
-                    .fallbackToDestructiveMigration()
-                    .build()
+                    dbName
+                ).build()
                 INSTANCE = instance
                 instance
             }
