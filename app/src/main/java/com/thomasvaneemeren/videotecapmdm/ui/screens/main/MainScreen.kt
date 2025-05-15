@@ -1,81 +1,102 @@
 package com.thomasvaneemeren.videotecapmdm.ui.screens.main
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
+import androidx.compose.material3.icons.Icons
+import androidx.compose.material3.icons.filled.Add
+import androidx.compose.material3.icons.filled.MoreVert
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
-import com.thomasvaneemeren.videotecapmdm.data.model.Movie
+
+data class Movie(
+    val id: Int,
+    val title: String,
+    val genre: String,
+    val isFavorite: Boolean
+)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
-    navController: NavController,
-    viewModel: MainViewModel = hiltViewModel()
+    username: String,
+    movies: List<Movie> = emptyList(),
+    onNavigateToAdd: () -> Unit,
+    onNavigateToDetail: (Int) -> Unit,
+    onLogout: () -> Unit,
+    onNavigateToAuthor: () -> Unit
 ) {
-    val username by viewModel.username.collectAsState()
-    val movies by viewModel.movies.collectAsState()
+    var expanded by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Videoteca de $username") }
+                title = { Text(text = "Videoteca - $username") },
+                actions = {
+                    IconButton(onClick = { expanded = true }) {
+                        Icon(Icons.Default.MoreVert, contentDescription = "Menú")
+                    }
+                    DropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false }
+                    ) {
+                        DropdownMenuItem(text = { Text("Principal") }, onClick = {
+                            expanded = false
+                            // Navegar a Main (ya está)
+                        })
+                        DropdownMenuItem(text = { Text("Añadir") }, onClick = {
+                            expanded = false
+                            onNavigateToAdd()
+                        })
+                        DropdownMenuItem(text = { Text("Cerrar sesión") }, onClick = {
+                            expanded = false
+                            onLogout()
+                        })
+                        DropdownMenuItem(text = { Text("Autor") }, onClick = {
+                            expanded = false
+                            onNavigateToAuthor()
+                        })
+                    }
+                }
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = { navController.navigate("add_movie") }) {
-                Icon(Icons.Default.Add, "Añadir película")
+            FloatingActionButton(onClick = onNavigateToAdd) {
+                Icon(Icons.Default.Add, contentDescription = "Añadir Película")
             }
-        }
-    ) { padding ->
-        if (movies.isEmpty()) {
-            Box(
+        },
+        content = { padding ->
+            LazyColumn(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(padding),
-                contentAlignment = Alignment.Center
-            ) {
-                Text("No hay películas añadidas")
-            }
-        } else {
-            LazyColumn(
-                modifier = Modifier.padding(padding),
-                contentPadding = PaddingValues(16.dp)
+                    .padding(padding)
             ) {
                 items(movies) { movie ->
-                    MovieItem(
-                        movie = movie,
-                        onClick = { navController.navigate("detail/${movie.id}") }
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
+                    MovieItem(movie = movie, onClick = { onNavigateToDetail(movie.id) })
                 }
             }
         }
-    }
+    )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MovieItem(
-    movie: Movie,
-    onClick: () -> Unit
-) {
+fun MovieItem(movie: Movie, onClick: () -> Unit) {
     Card(
-        onClick = onClick,
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+            .clickable { onClick() },
+        elevation = CardDefaults.cardElevation(4.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text(movie.title, style = MaterialTheme.typography.titleLarge)
-            Text(movie.genre.name, style = MaterialTheme.typography.bodyMedium)
-            Text("${movie.duration} min", style = MaterialTheme.typography.bodySmall)
+            Text(text = movie.title, style = MaterialTheme.typography.titleMedium)
+            Text(text = movie.genre, style = MaterialTheme.typography.bodyMedium)
         }
     }
 }
