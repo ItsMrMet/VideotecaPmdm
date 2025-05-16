@@ -79,6 +79,7 @@ dependencies {
 
     // Room
     implementation("androidx.room:room-ktx:2.6.0")
+    implementation(libs.androidx.material3.android)
     kapt("androidx.room:room-compiler:2.6.0")
 
     // Coroutines
