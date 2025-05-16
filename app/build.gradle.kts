@@ -1,8 +1,8 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
-    id("com.google.dagger.hilt.android")  // <-- Añade esto sin "version"
-    kotlin("kapt")  // <-- Asegúrate de tener esto
+    id("com.google.dagger.hilt.android")
+    kotlin("kapt")
     id("org.jetbrains.kotlin.plugin.serialization")
 }
 
@@ -43,7 +43,7 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = libs.versions.compose.compiler.get()
+        kotlinCompilerExtensionVersion = "1.5.7" // Fijar versión compatible
     }
     packaging {
         resources {
@@ -52,13 +52,21 @@ android {
     }
 }
 
+// FORZAR javax.inject para evitar conflictos con Hilt/Dagger
+configurations.all {
+    resolutionStrategy {
+        force("javax.inject:javax.inject:1")
+    }
+}
+
+
 dependencies {
     // Core Android
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
 
     // Compose
-    implementation("androidx.activity:activity-compose:1.8.0")
+    implementation("androidx.activity:activity-compose:1.8.1") // Version en TOML
     implementation(platform("androidx.compose:compose-bom:2023.10.01"))
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-graphics")
@@ -79,7 +87,6 @@ dependencies {
 
     // Room
     implementation("androidx.room:room-ktx:2.6.0")
-    implementation(libs.androidx.material3.android)
     kapt("androidx.room:room-compiler:2.6.0")
 
     // Coroutines
@@ -108,4 +115,7 @@ dependencies {
 
     // Serialization
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
+
+    // Compose Foundation
+    implementation("androidx.compose.foundation:foundation")
 }

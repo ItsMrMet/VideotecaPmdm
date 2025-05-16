@@ -18,10 +18,9 @@ import kotlinx.coroutines.launch
 @Composable
 fun OnboardingScreen(
     navController: NavController,
-    viewModel: OnboardingViewModel = hiltViewModel()
+    viewModel: OnboardingViewModel = hiltViewModel(),
+    onUserSaved: (String) -> Unit   // <-- Agregado callback con el nombre y tipo adecuado
 ) {
-    var inputName by remember { mutableStateOf("") }
-
     var username by remember { mutableStateOf(TextFieldValue("")) }
 
     Column(
@@ -41,7 +40,7 @@ fun OnboardingScreen(
         Spacer(modifier = Modifier.height(24.dp))
         Button(
             enabled = username.text.isNotBlank(),
-            onClick = { onUserSaved(username.text.trim()) }
+            onClick = { onUserSaved(username.text.trim()) }  // Aquí llamas al callback
         ) {
             Text(text = "Guardar")
         }

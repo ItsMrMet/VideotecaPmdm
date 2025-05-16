@@ -1,25 +1,34 @@
 package com.thomasvaneemeren.videotecapmdm.ui.screens.add
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.thomasvaneemeren.videotecapmdm.ui.viewmodels.AddEditViewModel
+import com.thomasvaneemeren.videotecapmdm.data.model.getGenreList
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.ui.Alignment
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddScreen(
     navController: NavHostController,
     viewModel: AddEditViewModel = hiltViewModel()
 ) {
-    var title by remember { mutableStateOf(TextFieldValue("")) }
-    var genre by remember { mutableStateOf(TextFieldValue("")) }
-    var synopsis by remember { mutableStateOf(TextFieldValue("")) }
-    var duration by remember { mutableStateOf(TextFieldValue("")) }
-    var director by remember { mutableStateOf(TextFieldValue("")) }
+    var title by remember { mutableStateOf("") }
+    var expanded by remember { mutableStateOf(false) }
+    var genre by remember { mutableStateOf("") }
+    val genres = getGenreList()
+    var synopsis by remember { mutableStateOf("") }
+    var duration by remember { mutableStateOf("") }
+    var director by remember { mutableStateOf("") }
     var isFavorite by remember { mutableStateOf(false) }
 
     Column(
@@ -32,7 +41,37 @@ fun AddScreen(
         Spacer(modifier = Modifier.height(16.dp))
         TextField(value = title, onValueChange = { title = it }, label = { Text("Título") })
         Spacer(modifier = Modifier.height(8.dp))
-        TextField(value = genre, onValueChange = { genre = it }, label = { Text("Género") })
+
+        ExposedDropdownMenuBox(
+            expanded = expanded,
+            onExpandedChange = { expanded = !expanded }
+        ) {
+            OutlinedTextField(
+                value = genre,
+                onValueChange = {},
+                label = { Text("Género") },
+                readOnly = true,
+                trailingIcon = {
+                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+                },
+                modifier = Modifier.menuAnchor()
+            )
+            ExposedDropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false }
+            ) {
+                genres.forEach { genreOption ->
+                    DropdownMenuItem(
+                        text = { Text(genreOption) },
+                        onClick = {
+                            genre = genreOption
+                            expanded = false
+                        }
+                    )
+                }
+            }
+        }
+
         Spacer(modifier = Modifier.height(8.dp))
         TextField(value = synopsis, onValueChange = { synopsis = it }, label = { Text("Sinopsis") })
         Spacer(modifier = Modifier.height(8.dp))
@@ -41,13 +80,13 @@ fun AddScreen(
             onValueChange = { duration = it },
             label = { Text("Duración (min)") },
             singleLine = true,
-            keyboardOptions = androidx.compose.ui.text.input.KeyboardOptions.Default.copy(keyboardType = androidx.compose.ui.text.input.KeyboardType.Number)
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
         )
         Spacer(modifier = Modifier.height(8.dp))
         TextField(value = director, onValueChange = { director = it }, label = { Text("Director") })
         Spacer(modifier = Modifier.height(8.dp))
         Row(
-            verticalAlignment = androidx.compose.ui.Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically
         ) {
             Checkbox(checked = isFavorite, onCheckedChange = { isFavorite = it })
             Spacer(modifier = Modifier.width(8.dp))
@@ -55,14 +94,27 @@ fun AddScreen(
         }
         Spacer(modifier = Modifier.height(24.dp))
         Row {
-            Button(onClick = {
-                val dur = duration.text.toIntOrNull() ?: 0
-                onSave(title.text.trim(), genre.text.trim(), synopsis.text.trim(), dur, director.text.trim(), isFavorite)
-            }, enabled = title.text.isNotBlank() && genre.text.isNotBlank()) {
+            Button(
+                onClick = {
+                    val dur = duration.toIntOrNull() ?: 0
+                    viewModel.saveMovie(
+                        title = title.trim(),
+                        genre = genre.uppercase(),
+                        synopsis = synopsis.trim(),
+                        duration = dur,
+                        director = director.trim(),
+                        isFavorite = isFavorite
+                    )
+                    navController.popBackStack()
+                },
+                enabled = title.isNotBlank() && genre.isNotBlank()
+            ) {
                 Text("Guardar")
             }
             Spacer(modifier = Modifier.width(16.dp))
-            OutlinedButton(onClick = onCancel) {
+            OutlinedButton(onClick = {
+                navController.popBackStack()
+            }) {
                 Text("Cancelar")
             }
         }

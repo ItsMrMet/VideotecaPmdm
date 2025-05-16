@@ -27,9 +27,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavController
+import com.thomasvaneemeren.videotecapmdm.ui.components.MovieCard
 import androidx.navigation.NavHostController
-import com.thomasvaneemeren.videotecapmdm.data.entities.MovieEntity
+
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -53,9 +53,9 @@ fun MainScreen(
             TopAppBar(
                 title = {
                     Column {
-                        Text("Videoteca", style = MaterialTheme.typography.h6)
+                        Text("Videoteca", style = MaterialTheme.typography.headlineSmall)
                         if (userName != null) {
-                            Text("Usuario: $userName", style = MaterialTheme.typography.caption)
+                            Text("Usuario: $userName", style = MaterialTheme.typography.bodySmall)
                         }
                     }
                 },
@@ -134,7 +134,7 @@ fun MainScreen(
                     modifier = Modifier.fillMaxSize()
                 ) {
                     items(movies) { movie ->
-                        MovieItem(movie = movie, onClick = {
+                        MovieCard(movie = movie, onClick = {
                             navController.navigate("detail/${movie.id}")
                         })
                     }

@@ -9,25 +9,21 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
-import com.thomasvaneemeren.videotecapmdm.data.datastore.UserPreferencesRepository
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
+import kotlinx.coroutines.delay
+import com.thomasvaneemeren.videotecapmdm.ui.viewmodels.SplashViewModel
 
 @Composable
 fun SplashScreen(
     navController: NavController,
-    userPreferencesRepository: UserPreferencesRepository = hiltViewModel()
+    viewModel: SplashViewModel = hiltViewModel()
 ) {
-    val scope = rememberCoroutineScope()
-    var userName by remember { mutableStateOf<String?>(null) }
+    val userName by viewModel.userName.collectAsState()
 
-    LaunchedEffect(Unit) {
-        userName = userPreferencesRepository.getUserName()
-        delay(1500) // splash delay
-
-        if (userName.isNullOrBlank()) {
+    LaunchedEffect(userName) {
+        delay(1500)
+        if (userName.isBlank()) {
             navController.navigate("onboarding") {
                 popUpTo("splash") { inclusive = true }
             }
@@ -50,3 +46,4 @@ fun SplashScreen(
         )
     }
 }
+

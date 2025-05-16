@@ -19,8 +19,6 @@ private val Context.dataStore by preferencesDataStore(name = "user_prefs")
 @InstallIn(SingletonComponent::class)
 object AppModule {
 
-    private val Context.dataStore by preferencesDataStore(name = "user_prefs")
-
     @Provides
     @Singleton
     fun provideDataStore(@ApplicationContext context: Context): DataStore<Preferences> {
@@ -38,7 +36,4 @@ object AppModule {
     fun provideDatabaseFactory(@ApplicationContext context: Context): DatabaseFactory {
         return DatabaseFactory(context)
     }
-
-    // No proporcionamos VideotecaDatabase ni MovieDao aquí
 }
-
