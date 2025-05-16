@@ -6,11 +6,14 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
+import com.thomasvaneemeren.videotecapmdm.ui.viewmodels.AddEditViewModel
 
 @Composable
 fun AddScreen(
-    onSave: (title: String, genre: String, synopsis: String, duration: Int, director: String, isFavorite: Boolean) -> Unit,
-    onCancel: () -> Unit
+    navController: NavHostController,
+    viewModel: AddEditViewModel = hiltViewModel()
 ) {
     var title by remember { mutableStateOf(TextFieldValue("")) }
     var genre by remember { mutableStateOf(TextFieldValue("")) }

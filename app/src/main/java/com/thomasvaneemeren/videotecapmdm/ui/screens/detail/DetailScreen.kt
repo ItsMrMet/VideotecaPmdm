@@ -9,6 +9,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavHostController
 
 data class MovieDetail(
     val id: Int,
@@ -23,10 +25,9 @@ data class MovieDetail(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DetailScreen(
-    movie: MovieDetail,
-    onBack: () -> Unit,
-    onDelete: (Int) -> Unit,
-    onEdit: (Int) -> Unit
+    movieId: Int,
+    navController: NavHostController,
+    viewModel: DetailViewModel = hiltViewModel()
 ) {
     Scaffold(
         topBar = {
