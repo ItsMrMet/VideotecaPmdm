@@ -7,66 +7,88 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import com.thomasvaneemeren.videotecapmdm.ui.components.ScaffoldLayout
 import com.thomasvaneemeren.videotecapmdm.ui.viewmodels.DetailViewModel
+import com.thomasvaneemeren.videotecapmdm.ui.viewmodels.UserPreferencesViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DetailScreen(
     movieId: Int,
     navController: NavHostController,
-    viewModel: DetailViewModel = hiltViewModel()
+    viewModel: DetailViewModel = hiltViewModel(),
+    userPreferencesViewModel: UserPreferencesViewModel = hiltViewModel()
 ) {
     val movie by viewModel.getMovieById(movieId).collectAsState(initial = null)
+    val userName by userPreferencesViewModel.userName.collectAsState(initial = "")
 
     movie?.let {
-        Scaffold(
-            topBar = {
-                TopAppBar(
-                    title = { Text(text = it.title) },
-                    navigationIcon = {
-                        IconButton(onClick = { navController.popBackStack() }) {
-                            Icon(Icons.Filled.ArrowBack, contentDescription = "Volver")
-                        }
-                    },
-                    actions = {
+        ScaffoldLayout(
+            userName = userName ?: "",
+            navController = navController,
+            currentRoute = "detail/$movieId"
+        ) { padding ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(padding)
+                    .padding(24.dp)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(Icons.Filled.ArrowBack, contentDescription = "Volver")
+                    }
+                    Row {
                         IconButton(onClick = {
                             viewModel.deleteMovie(it)
                             navController.popBackStack()
                         }) {
                             Icon(Icons.Filled.Delete, contentDescription = "Eliminar")
                         }
-
-                        IconButton(onClick = { navController.navigate("edit/${it.id}") }) {
+                        IconButton(onClick = {
+                            navController.navigate("edit/${it.id}")
+                        }) {
                             Icon(Icons.Filled.Edit, contentDescription = "Editar")
                         }
                     }
-                )
-            },
-            content = { padding ->
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(padding)
-                        .padding(16.dp)
-                ) {
-                    Text("Género: ${it.genre}", style = MaterialTheme.typography.bodyLarge)
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text("Director: ${it.director}", style = MaterialTheme.typography.bodyLarge)
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text("Duración: ${it.duration} min", style = MaterialTheme.typography.bodyLarge)
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text("Sinopsis:", style = MaterialTheme.typography.titleMedium)
-                    Text(it.synopsis, style = MaterialTheme.typography.bodyMedium)
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text("Favorita: ${if (it.isFavorite) "Sí" else "No"}", style = MaterialTheme.typography.bodyLarge)
                 }
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                Text(text = it.title, style = MaterialTheme.typography.headlineMedium)
+                Spacer(modifier = Modifier.height(16.dp))
+                DetailText(label = "Género", value = it.genre)
+                DetailText(label = "Director", value = it.director)
+                DetailText(label = "Duración", value = "${it.duration} min")
+                DetailText(label = "Favorita", value = if (it.isFavorite) "Sí" else "No")
+
+                Spacer(modifier = Modifier.height(16.dp))
+                Text("Sinopsis", style = MaterialTheme.typography.titleMedium)
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(it.synopsis, style = MaterialTheme.typography.bodyMedium)
             }
-        )
-    } ?: Box(Modifier.fillMaxSize(), contentAlignment = androidx.compose.ui.Alignment.Center) {
+        }
+    } ?: Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
         CircularProgressIndicator()
+    }
+}
+
+@Composable
+fun DetailText(label: String, value: String) {
+    Column(modifier = Modifier.padding(vertical = 4.dp)) {
+        Text("$label:", style = MaterialTheme.typography.labelLarge)
+        Text(value, style = MaterialTheme.typography.bodyLarge)
     }
 }

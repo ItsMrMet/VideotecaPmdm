@@ -1,156 +1,93 @@
 package com.thomasvaneemeren.videotecapmdm.ui.screens.main
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
-import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
-import com.thomasvaneemeren.videotecapmdm.ui.components.MovieCard
 import androidx.navigation.NavHostController
+import com.thomasvaneemeren.videotecapmdm.navigation.Screen
+import com.thomasvaneemeren.videotecapmdm.ui.components.MovieCard
+import com.thomasvaneemeren.videotecapmdm.ui.components.ScaffoldLayout
 
-
-
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(
     navController: NavHostController,
-    viewModel: MainViewModel = hiltViewModel()
+    viewModel: MainViewModel
 ) {
-    val userName by viewModel.userName.collectAsState()
     val movies by viewModel.movies.collectAsState()
+    var searchQuery by remember { mutableStateOf("") }
 
-    var expanded by remember { mutableStateOf(false) }
-    var searchQuery by remember { mutableStateOf(TextFieldValue("")) }
-
-    LaunchedEffect(searchQuery.text) {
-        viewModel.filterMovies(searchQuery.text)
+    val filteredMovies = if (searchQuery.isBlank()) {
+        movies
+    } else {
+        movies.filter { it.title.contains(searchQuery, ignoreCase = true) }
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Column {
-                        Text("Videoteca", style = MaterialTheme.typography.headlineSmall)
-                        if (userName != null) {
-                            Text("Usuario: $userName", style = MaterialTheme.typography.bodySmall)
-                        }
-                    }
-                },
-                actions = {
-                    Box {
-                        IconButton(onClick = { expanded = true }) {
-                            Icon(Icons.Default.Add, contentDescription = "Menu")
-                        }
-                        DropdownMenu(
-                            expanded = expanded,
-                            onDismissRequest = { expanded = false }
-                        ) {
-                            DropdownMenuItem(
-                                onClick = {
-                                    navController.navigate("main")
-                                    expanded = false
-                                },
-                                text = { Text("Principal") }
-                            )
-
-                            DropdownMenuItem(
-                                onClick = {
-                                    navController.navigate("add")
-                                    expanded = false
-                                },
-                                text = { Text("Añadir") }
-                            )
-
-                            DropdownMenuItem(
-                                onClick = {
-                                    viewModel.logout()
-                                    navController.navigate("onboarding")
-                                    expanded = false
-                                },
-                                text = { Text("Cerrar sesión") }
-                            )
-
-                            DropdownMenuItem(
-                                onClick = {
-                                    navController.navigate("author")
-                                    expanded = false
-                                },
-                                text = { Text("Autor") }
-                            )
-                        }
-                    }
-                }
-            )
-        },
-        floatingActionButton = {
-            FloatingActionButton(onClick = { navController.navigate("add") }) {
-                Icon(Icons.Default.Add, contentDescription = "Añadir")
-            }
-        }
+    ScaffoldLayout(
+        userName = viewModel.userName.collectAsState().value ?: "",
+        navController = navController,
+        currentRoute = Screen.Main.route
     ) { padding ->
-        Column(
-            modifier = Modifier
-                .padding(padding)
-                .fillMaxSize()
-        ) {
-            TextField(
-                value = searchQuery,
-                onValueChange = { searchQuery = it },
-                label = { Text("Buscar película...") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(8.dp)
-            )
 
-            AnimatedVisibility(
-                visible = movies.isNotEmpty(),
-                enter = fadeIn(),
-                exit = fadeOut()
+        Box(modifier = Modifier
+            .fillMaxSize()
+            .padding(padding)) {
+
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp)
             ) {
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    items(movies) { movie ->
-                        MovieCard(movie = movie, onClick = {
-                            navController.navigate("detail/${movie.id}")
-                        })
+                OutlinedTextField(
+                    value = searchQuery,
+                    onValueChange = { searchQuery = it },
+                    label = { Text("Buscar película") },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                if (filteredMovies.isEmpty()) {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text("No se encontraron películas.")
+                    }
+                } else {
+                    LazyColumn(
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        items(filteredMovies.size) { index ->
+                            val movie = filteredMovies[index]
+                            MovieCard(
+                                movie = movie,
+                                onClick = {
+                                    navController.navigate("detail/${movie.id}")
+                                }
+                            )
+                        }
                     }
                 }
             }
 
-            if (movies.isEmpty()) {
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text("No se encontraron películas")
-                }
+            // Floating Action Button para añadir película
+            FloatingActionButton(
+                onClick = { navController.navigate(Screen.Add.route) }, // igual que menú, navegación simple
+                containerColor = MaterialTheme.colorScheme.primary,
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(16.dp)
+            ) {
+                Icon(Icons.Default.Add, contentDescription = "Añadir película")
             }
+
         }
     }
 }
-
-

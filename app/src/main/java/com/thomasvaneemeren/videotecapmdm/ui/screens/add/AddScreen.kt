@@ -4,26 +4,27 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import com.thomasvaneemeren.videotecapmdm.ui.viewmodels.AddEditViewModel
 import com.thomasvaneemeren.videotecapmdm.data.model.getGenreList
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.ui.Alignment
+import com.thomasvaneemeren.videotecapmdm.ui.viewmodels.AddEditViewModel
+import com.thomasvaneemeren.videotecapmdm.ui.components.ScaffoldLayout
+import com.thomasvaneemeren.videotecapmdm.ui.viewmodels.UserPreferencesViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddScreen(
     navController: NavHostController,
-    viewModel: AddEditViewModel = hiltViewModel()
+    addEditViewModel: AddEditViewModel = hiltViewModel(),
+    userPreferencesViewModel: UserPreferencesViewModel = hiltViewModel()
 ) {
+    val userName by userPreferencesViewModel.userName.collectAsState(initial = "")
     var title by remember { mutableStateOf("") }
-    var expanded by remember { mutableStateOf(false) }
+    var expandedGenre by remember { mutableStateOf(false) }
     var genre by remember { mutableStateOf("") }
     val genres = getGenreList()
     var synopsis by remember { mutableStateOf("") }
@@ -31,91 +32,125 @@ fun AddScreen(
     var director by remember { mutableStateOf("") }
     var isFavorite by remember { mutableStateOf(false) }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp),
-        verticalArrangement = Arrangement.Top
-    ) {
-        Text("Añadir Película", style = MaterialTheme.typography.headlineMedium)
-        Spacer(modifier = Modifier.height(16.dp))
-        TextField(value = title, onValueChange = { title = it }, label = { Text("Título") })
-        Spacer(modifier = Modifier.height(8.dp))
+    val isFormValid = title.isNotBlank() &&
+            genre.isNotBlank() &&
+            synopsis.isNotBlank() &&
+            duration.isNotBlank() && // duración no vacía
+            duration.toIntOrNull() != null && // duración debe ser número válido
+            director.isNotBlank()
 
-        ExposedDropdownMenuBox(
-            expanded = expanded,
-            onExpandedChange = { expanded = !expanded }
-        ) {
-            OutlinedTextField(
-                value = genre,
-                onValueChange = {},
-                label = { Text("Género") },
-                readOnly = true,
-                trailingIcon = {
-                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
-                },
-                modifier = Modifier.menuAnchor()
-            )
-            ExposedDropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false }
+    ScaffoldLayout(
+        userName = userName.toString(),
+        navController = navController,
+        currentRoute = "add"
+    ) { paddingValues ->
+        Scaffold(
+            modifier = Modifier.padding(paddingValues)
+        ) { innerPadding ->
+            Column(
+                modifier = Modifier
+                    .padding(innerPadding)
+                    .padding(24.dp)
+                    .fillMaxSize(),
+                verticalArrangement = Arrangement.Top
             ) {
-                genres.forEach { genreOption ->
-                    DropdownMenuItem(
-                        text = { Text(genreOption) },
-                        onClick = {
-                            genre = genreOption
-                            expanded = false
+                Text("Añadir Película", style = MaterialTheme.typography.headlineMedium)
+                Spacer(modifier = Modifier.height(16.dp))
+                OutlinedTextField(value = title, onValueChange = { title = it }, label = { Text("Título") })
+                Spacer(modifier = Modifier.height(8.dp))
+
+                ExposedDropdownMenuBox(
+                    expanded = expandedGenre,
+                    onExpandedChange = { expandedGenre = !expandedGenre }
+                ) {
+                    OutlinedTextField(
+                        value = genre,
+                        onValueChange = {},
+                        label = { Text("Género") },
+                        readOnly = true,
+                        trailingIcon = {
+                            ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedGenre)
+                        },
+                        modifier = Modifier.menuAnchor()
+                    )
+                    ExposedDropdownMenu(
+                        expanded = expandedGenre,
+                        onDismissRequest = { expandedGenre = false }
+                    ) {
+                        genres.forEach { genreOption ->
+                            DropdownMenuItem(
+                                text = { Text(genreOption) },
+                                onClick = {
+                                    genre = genreOption
+                                    expandedGenre = false
+                                }
+                            )
                         }
-                    )
+                    }
                 }
-            }
-        }
 
-        Spacer(modifier = Modifier.height(8.dp))
-        TextField(value = synopsis, onValueChange = { synopsis = it }, label = { Text("Sinopsis") })
-        Spacer(modifier = Modifier.height(8.dp))
-        TextField(
-            value = duration,
-            onValueChange = { duration = it },
-            label = { Text("Duración (min)") },
-            singleLine = true,
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        TextField(value = director, onValueChange = { director = it }, label = { Text("Director") })
-        Spacer(modifier = Modifier.height(8.dp))
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Checkbox(checked = isFavorite, onCheckedChange = { isFavorite = it })
-            Spacer(modifier = Modifier.width(8.dp))
-            Text("Marcar como favorita")
-        }
-        Spacer(modifier = Modifier.height(24.dp))
-        Row {
-            Button(
-                onClick = {
-                    val dur = duration.toIntOrNull() ?: 0
-                    viewModel.saveMovie(
-                        title = title.trim(),
-                        genre = genre.uppercase(),
-                        synopsis = synopsis.trim(),
-                        duration = dur,
-                        director = director.trim(),
-                        isFavorite = isFavorite
-                    )
-                    navController.popBackStack()
-                },
-                enabled = title.isNotBlank() && genre.isNotBlank()
-            ) {
-                Text("Guardar")
-            }
-            Spacer(modifier = Modifier.width(16.dp))
-            OutlinedButton(onClick = {
-                navController.popBackStack()
-            }) {
-                Text("Cancelar")
+                Spacer(modifier = Modifier.height(8.dp))
+                OutlinedTextField(
+                    value = synopsis,
+                    onValueChange = { synopsis = it },
+                    label = { Text("Sinopsis") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                OutlinedTextField(
+                    value = duration,
+                    onValueChange = { newValue ->
+                        // Solo permitir números (filtrar cualquier cosa que no sea dígito)
+                        if (newValue.all { it.isDigit() }) {
+                            duration = newValue
+                        }
+                    },
+                    label = { Text("Duración (min)") },
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                OutlinedTextField(value = director, onValueChange = { director = it }, label = { Text("Director") })
+                Spacer(modifier = Modifier.height(8.dp))
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Checkbox(checked = isFavorite, onCheckedChange = { isFavorite = it })
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Marcar como favorita")
+                }
+                Spacer(modifier = Modifier.height(24.dp))
+                Row {
+                    Button(
+                        onClick = {
+                            val dur = duration.toInt() // seguro porque validamos antes
+                            addEditViewModel.saveMovie(
+                                title = title.trim(),
+                                genre = genre.uppercase(),
+                                synopsis = synopsis.trim(),
+                                duration = dur,
+                                director = director.trim(),
+                                isFavorite = isFavorite
+                            )
+                            navController.navigate("main") {
+                                popUpTo("main") { inclusive = true }
+                            }
+                        },
+                        enabled = isFormValid
+                    ) {
+                        Text("Guardar")
+                    }
+
+
+                    OutlinedButton(onClick = {
+                        navController.navigate("main") {
+                            popUpTo("main") { inclusive = true }
+                        }
+                    }) {
+                        Text("Cancelar")
+                    }
+
+                }
             }
         }
     }

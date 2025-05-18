@@ -6,6 +6,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.preferencesDataStore
 import com.thomasvaneemeren.videotecapmdm.data.database.DatabaseFactory
 import com.thomasvaneemeren.videotecapmdm.data.datastore.UserPreferencesRepository
+import com.thomasvaneemeren.videotecapmdm.data.repository.UserFavoriteRepositoryImpl
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -36,4 +37,12 @@ object AppModule {
     fun provideDatabaseFactory(@ApplicationContext context: Context): DatabaseFactory {
         return DatabaseFactory(context)
     }
+
+    @Provides
+    @Singleton
+    fun provideUserFavoriteRepository(databaseFactory: DatabaseFactory, userPreferences: UserPreferencesRepository): UserFavoriteRepository {
+        val db = databaseFactory.createDatabase("default") // cambiar si necesitas
+        return UserFavoriteRepositoryImpl(db.userFavoriteDao())
+    }
+
 }

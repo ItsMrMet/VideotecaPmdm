@@ -6,14 +6,14 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface MovieDao {
-    @Query("SELECT * FROM movies WHERE userId = :userId")
-    fun getMoviesByUser(userId: String): Flow<List<MovieEntity>>
+    @Query("SELECT * FROM movies")
+    fun getAllMovies(): Flow<List<MovieEntity>>
 
-    @Query("SELECT * FROM movies WHERE id = :id AND userId = :userId LIMIT 1")
-    suspend fun getMovieById(id: Int, userId: String): MovieEntity?
+    @Query("SELECT * FROM movies WHERE id = :id LIMIT 1")
+    suspend fun getMovieById(id: Int): MovieEntity?
 
-    @Query("SELECT * FROM movies WHERE id = :id AND userId = :userId LIMIT 1")
-    fun getMovieByIdFlow(id: Int, userId: String): Flow<MovieEntity?>
+    @Query("SELECT * FROM movies WHERE id = :id LIMIT 1")
+    fun getMovieByIdFlow(id: Int): Flow<MovieEntity?>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(movie: MovieEntity)
@@ -24,3 +24,4 @@ interface MovieDao {
     @Delete
     suspend fun delete(movie: MovieEntity)
 }
+
