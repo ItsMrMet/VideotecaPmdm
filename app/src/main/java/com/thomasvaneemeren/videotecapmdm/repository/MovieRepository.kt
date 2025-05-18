@@ -9,6 +9,6 @@ interface MovieRepository {
     suspend fun insertMovie(movie: MovieEntity)
     suspend fun updateMovie(movie: MovieEntity)
     suspend fun deleteMovie(movie: MovieEntity)
-    suspend fun getMovieById(id: Int): MovieEntity?
+    suspend fun getMovieById(id: Int, userId: String): MovieEntity?
 }
 

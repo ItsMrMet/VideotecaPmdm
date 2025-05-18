@@ -15,7 +15,7 @@ abstract class VideotecaDatabase : RoomDatabase() {
 
 
     companion object {
-        fun getInstance(context: Context): VideotecaDatabase {
+        fun getInstance(context: Context, userName: String): VideotecaDatabase {
             return Room.databaseBuilder(
                 context.applicationContext,
                 VideotecaDatabase::class.java,

@@ -11,6 +11,14 @@ data class MovieEntity(
     val genre: String,
     val synopsis: String,
     val duration: Int,
-    val director: String
+    val director: String,
+    val userId: String
 )
+
+
+data class MovieWithFavorite(
+    val movie: MovieEntity,
+    val isFavorite: Boolean
+)
+
 
