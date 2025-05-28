@@ -39,6 +39,12 @@ fun EditScreen(
         addEditViewModel.loadMovie(movieId)
     }
 
+    LaunchedEffect(movieId) {
+        addEditViewModel.isFavorite(movieId).collect { favorite ->
+            isFavorite = favorite
+        }
+    }
+
     LaunchedEffect(movie) {
         movie?.let {
             title = it.title
@@ -46,7 +52,6 @@ fun EditScreen(
             synopsis = it.synopsis
             duration = it.duration.toString()
             director = it.director
-            isFavorite = it.isFavorite
         }
     }
 
@@ -56,7 +61,9 @@ fun EditScreen(
         ScaffoldLayout(
             userName = userName ?: "",
             navController = navController,
-            currentRoute = "edit/$movieId"
+            currentRoute = "edit/$movieId",
+            showBackButton = true,
+            onBackClick = { navController.popBackStack() }
         ) { paddingValues ->
             Scaffold(
                 modifier = Modifier.padding(paddingValues),
@@ -145,3 +152,4 @@ fun EditScreen(
         CircularProgressIndicator()
     }
 }
+

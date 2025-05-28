@@ -33,12 +33,9 @@ class UserPreferencesRepository @Inject constructor(
         }
     }
 
-
     suspend fun getUserName(): String? {
         return dataStore.data.map { preferences ->
             preferences[USER_NAME_KEY]
         }.first()
     }
-
-
 }

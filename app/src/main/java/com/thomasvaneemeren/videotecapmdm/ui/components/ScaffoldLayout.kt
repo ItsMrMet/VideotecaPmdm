@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -15,40 +16,53 @@ import com.thomasvaneemeren.videotecapmdm.navigation.Screen
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ScaffoldLayout(
-    userName: String,
+    userName: String?,
     navController: NavHostController,
     currentRoute: String,
+    showBackButton: Boolean = false,
+    onBackClick: (() -> Unit)? = null,
     content: @Composable (PaddingValues) -> Unit
 ) {
     var menuExpanded by remember { mutableStateOf(false) }
+
+    val navigationIcon: @Composable () -> Unit = if (showBackButton && onBackClick != null) {
+        {
+            IconButton(onClick = onBackClick) {
+                Icon(Icons.Filled.ArrowBack, contentDescription = "Volver")
+            }
+        }
+    } else {
+        {}
+    }
+
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text("Videoteca") },
+                navigationIcon = navigationIcon,
                 actions = {
                     Column {
-                        Text(
-                            text = userName,
-                            style = MaterialTheme.typography.labelMedium,
-                            modifier = Modifier.padding(end = 16.dp)
-                        )
                         IconButton(onClick = { menuExpanded = true }) {
-                            Icon(Icons.Default.MoreVert, contentDescription = "Menú")
+                            Icon(Icons.Filled.MoreVert, contentDescription = "Menú")
                         }
                         DropdownMenu(
                             expanded = menuExpanded,
                             onDismissRequest = { menuExpanded = false }
                         ) {
+                            Text(
+                                text = "Usuario: ${userName ?: "Cargando..."}",
+                                style = MaterialTheme.typography.labelLarge,
+                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                            )
+                            Divider()
                             DropdownMenuItem(
                                 text = { Text("Principal") },
                                 onClick = {
                                     menuExpanded = false
                                     if (currentRoute != Screen.Main.route) {
                                         navController.navigate(Screen.Main.route) {
-                                            popUpTo(navController.graph.startDestinationId) {
-                                                inclusive = true
-                                            }
+                                            popUpTo(navController.graph.startDestinationId) { inclusive = true }
                                             launchSingleTop = true
                                         }
                                     }
@@ -65,7 +79,6 @@ fun ScaffoldLayout(
                                     }
                                 }
                             )
-
                             DropdownMenuItem(
                                 text = { Text("Cerrar sesión") },
                                 onClick = {
@@ -99,3 +112,4 @@ fun ScaffoldLayout(
         content = content
     )
 }
+

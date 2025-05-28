@@ -26,7 +26,9 @@ fun AuthorScreen(
     ScaffoldLayout(
         userName = userName,
         navController = navController,
-        currentRoute = "author"
+        currentRoute = "author",
+        showBackButton = true,
+        onBackClick = { navController.popBackStack() }
     ) { padding ->
         Column(
             modifier = Modifier

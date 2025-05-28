@@ -10,20 +10,15 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface UserFavoriteDao {
+    @Query("SELECT * FROM user_favorites WHERE userId = :userId AND movieId = :movieId")
+    fun isFavorite(userId: String, movieId: Int): Flow<UserFavoriteEntity?>
 
     @Query("SELECT movieId FROM user_favorites WHERE userId = :userId")
-    fun getFavoriteMovieIdsByUser(userId: String): Flow<List<Int>>
+    fun getFavoriteMovieIds(userId: String): Flow<List<Int>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun addFavorite(favorite: UserFavoriteEntity)
+    suspend fun insert(favorite: UserFavoriteEntity)
 
     @Delete
-    suspend fun removeFavorite(favorite: UserFavoriteEntity)
-
-    @Query("DELETE FROM user_favorites WHERE userId = :userId")
-    suspend fun clearFavoritesForUser(userId: String)
-
-    @Query("SELECT * FROM user_favorites WHERE userId = :userId AND movieId = :movieId LIMIT 1")
-    fun existsFavorite(userId: String, movieId: Int): Flow<UserFavoriteEntity?>
+    suspend fun delete(favorite: UserFavoriteEntity)
 }
-

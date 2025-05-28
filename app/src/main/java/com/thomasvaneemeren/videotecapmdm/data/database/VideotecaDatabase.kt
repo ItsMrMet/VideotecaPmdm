@@ -4,11 +4,14 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
 import com.thomasvaneemeren.videotecapmdm.data.database.dao.MovieDao
 import com.thomasvaneemeren.videotecapmdm.data.database.dao.UserFavoriteDao
 import com.thomasvaneemeren.videotecapmdm.data.entities.MovieEntity
+import com.thomasvaneemeren.videotecapmdm.data.entities.UserFavoriteEntity
 
-@Database(entities = [MovieEntity::class], version = 1)
+@Database(entities = [MovieEntity::class, UserFavoriteEntity::class], version = 1)
+@TypeConverters(Converters::class)
 abstract class VideotecaDatabase : RoomDatabase() {
     abstract fun movieDao(): MovieDao
     abstract fun userFavoriteDao(): UserFavoriteDao
@@ -25,5 +28,3 @@ abstract class VideotecaDatabase : RoomDatabase() {
 
     }
 }
-
-

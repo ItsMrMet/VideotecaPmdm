@@ -1,29 +1,29 @@
-package com.thomasvaneemeren.videotecapmdm.data.repository
+package com.thomasvaneemeren.videotecapmdm.repository
 
 import com.thomasvaneemeren.videotecapmdm.data.database.dao.UserFavoriteDao
 import com.thomasvaneemeren.videotecapmdm.data.entities.UserFavoriteEntity
-import com.thomasvaneemeren.videotecapmdm.repository.UserFavoriteRepository
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.firstOrNull
+import javax.inject.Inject
 
-class UserFavoriteRepositoryImpl(
-    private val dao: UserFavoriteDao
+class UserFavoriteRepositoryImpl @Inject constructor(
+    private val userFavoriteDao: UserFavoriteDao
 ) : UserFavoriteRepository {
 
-    override fun isFavorite(userId: String, movieId: Int): Flow<Boolean> {
-        return dao.existsFavorite(userId, movieId).map { it != null }
+    override suspend fun isFavorite(userId: String, movieId: Int): Boolean {
+        return userFavoriteDao.isFavorite(userId, movieId).firstOrNull() != null
     }
 
     override fun getFavoriteMovieIds(userId: String): Flow<List<Int>> {
-        return dao.getFavoriteMovieIdsByUser(userId)
+        return userFavoriteDao.getFavoriteMovieIds(userId)
     }
 
     override suspend fun setFavorite(userId: String, movieId: Int, isFavorite: Boolean) {
-        val favorite = UserFavoriteEntity(userId, movieId)
+        val favorite = UserFavoriteEntity(userId = userId, movieId = movieId)
         if (isFavorite) {
-            dao.addFavorite(favorite)
+            userFavoriteDao.insert(favorite)
         } else {
-            dao.removeFavorite(favorite)
+            userFavoriteDao.delete(favorite)
         }
     }
 }

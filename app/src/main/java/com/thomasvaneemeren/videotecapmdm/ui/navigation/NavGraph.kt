@@ -12,9 +12,8 @@ import com.thomasvaneemeren.videotecapmdm.ui.screens.author.AuthorScreen
 import com.thomasvaneemeren.videotecapmdm.ui.screens.detail.DetailScreen
 import com.thomasvaneemeren.videotecapmdm.ui.screens.edit.EditScreen
 import com.thomasvaneemeren.videotecapmdm.ui.screens.main.MainScreen
-import com.thomasvaneemeren.videotecapmdm.ui.screens.main.MainViewModel
+import com.thomasvaneemeren.videotecapmdm.ui.viewmodels.MainViewModel
 import com.thomasvaneemeren.videotecapmdm.ui.screens.onboarding.OnboardingScreen
-import com.thomasvaneemeren.videotecapmdm.ui.viewmodels.AddEditViewModel
 import com.thomasvaneemeren.videotecapmdm.ui.viewmodels.DetailViewModel
 
 @Composable
@@ -30,15 +29,7 @@ fun AppNavGraph(
         }
 
         composable(Screen.Onboarding.route) {
-            OnboardingScreen(
-                navController = navController,
-                onUserSaved = { userName ->
-                    // Aquí puedes guardar el usuario o navegar
-                    navController.navigate(Screen.Main.route) {
-                        popUpTo(Screen.Splash.route) { inclusive = true }
-                    }
-                }
-            )
+            OnboardingScreen(navController = navController)
         }
 
         composable(Screen.Main.route) {

@@ -15,8 +15,11 @@ interface MovieDao {
     @Query("SELECT * FROM movies WHERE id = :id LIMIT 1")
     fun getMovieByIdFlow(id: Int): Flow<MovieEntity?>
 
+    @Query("SELECT * FROM movies WHERE userId = :userId")
+    fun getMoviesByUser(userId: String): Flow<List<MovieEntity>>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(movie: MovieEntity)
+    suspend fun insert(movie: MovieEntity): Long
 
     @Update
     suspend fun update(movie: MovieEntity)

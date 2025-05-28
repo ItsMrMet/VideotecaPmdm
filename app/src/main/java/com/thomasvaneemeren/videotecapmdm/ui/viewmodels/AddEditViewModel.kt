@@ -6,16 +6,20 @@ import com.thomasvaneemeren.videotecapmdm.data.database.DatabaseFactory
 import com.thomasvaneemeren.videotecapmdm.data.datastore.UserPreferencesRepository
 import com.thomasvaneemeren.videotecapmdm.data.entities.MovieEntity
 import com.thomasvaneemeren.videotecapmdm.data.repository.MovieRepositoryImpl
+import com.thomasvaneemeren.videotecapmdm.repository.UserFavoriteRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class AddEditViewModel @Inject constructor(
     private val userPreferencesRepository: UserPreferencesRepository,
-    private val databaseFactory: DatabaseFactory
+    private val databaseFactory: DatabaseFactory,
+    private val userFavoriteRepository: UserFavoriteRepository
 ) : ViewModel() {
 
     private val _movie = MutableStateFlow<MovieEntity?>(null)
@@ -35,6 +39,11 @@ class AddEditViewModel @Inject constructor(
         }
     }
 
+    fun isFavorite(movieId: Int): Flow<Boolean> = flow {
+        val user = userPreferencesRepository.getUserName() ?: return@flow
+        emit(userFavoriteRepository.isFavorite(user, movieId))
+    }
+
     fun saveMovie(
         title: String,
         genre: String,
@@ -45,33 +54,40 @@ class AddEditViewModel @Inject constructor(
     ) {
         viewModelScope.launch {
             val user = userPreferencesRepository.getUserName() ?: return@launch
-            val repo = getRepository() ?: return@launch
+            val db = databaseFactory.createDatabase(user)
+            val dao = db.movieDao()
 
-            val current = _movie.value
-            if (current == null) {
+            val currentMovie = movie.value
+            if (currentMovie != null) {
+                // Editar película existente
+                val updated = currentMovie.copy(
+                    title = title,
+                    genre = genre,
+                    synopsis = synopsis,
+                    duration = duration,
+                    director = director
+                )
+                dao.update(updated)
+                userFavoriteRepository.setFavorite(user, updated.id, isFavorite)
+            } else {
+                // Insertar nueva película
                 val newMovie = MovieEntity(
-                    id = 0,
                     title = title,
                     genre = genre,
                     synopsis = synopsis,
                     duration = duration,
                     director = director,
-                    isFavorite = isFavorite,
                     userId = user
                 )
-                repo.insertMovie(newMovie)
-            } else {
-                val updated = current.copy(
-                    title = title,
-                    genre = genre,
-                    synopsis = synopsis,
-                    duration = duration,
-                    director = director,
-                    isFavorite = isFavorite
-                )
-                repo.updateMovie(updated)
+                val id = dao.insert(newMovie)
+
+                // Guardar favorito si es necesario
+                if (isFavorite && id > 0) {
+                    userFavoriteRepository.setFavorite(user, id.toInt(), true)
+                }
             }
         }
     }
+
 }
 

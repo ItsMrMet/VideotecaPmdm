@@ -16,38 +16,31 @@ import javax.inject.Inject
 
 @HiltViewModel
 class DetailViewModel @Inject constructor(
-    private val databaseFactory: DatabaseFactory,
     private val userPreferencesRepository: UserPreferencesRepository,
+    private val databaseFactory: DatabaseFactory,
     private val userFavoriteRepository: UserFavoriteRepository
 ) : ViewModel() {
 
-    fun getMovieById(movieId: Int): Flow<MovieEntity?> = flow {
+    fun getMovieById(id: Int): Flow<MovieEntity?> = flow {
         val user = userPreferencesRepository.getUserName() ?: return@flow
         val db = databaseFactory.createDatabase(user)
-        val dao = db.movieDao()
-        emit(dao.getMovieById(movieId, user))
+        val movie = db.movieDao().getMovieById(id, user)
+        emit(movie)
     }
 
     fun isFavorite(movieId: Int): Flow<Boolean> = flow {
         val user = userPreferencesRepository.getUserName() ?: return@flow
-        emitAll(userFavoriteRepository.isFavorite(user, movieId))
-    }
-
-    fun toggleFavorite(movieId: Int, favorite: Boolean) {
-        viewModelScope.launch {
-            val user = userPreferencesRepository.getUserName() ?: return@launch
-            userFavoriteRepository.setFavorite(user, movieId, favorite)
-        }
+        emit(userFavoriteRepository.isFavorite(user, movieId))
     }
 
     fun deleteMovie(movie: MovieEntity) {
         viewModelScope.launch {
             val user = userPreferencesRepository.getUserName() ?: return@launch
             val db = databaseFactory.createDatabase(user)
-            val dao = db.movieDao()
-            val repo = MovieRepositoryImpl(dao)
-            repo.deleteMovie(movie.copy(userId = user))
+            db.movieDao().delete(movie)
+            userFavoriteRepository.setFavorite(user, movie.id, false)
         }
     }
 }
+
 

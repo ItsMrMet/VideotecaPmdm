@@ -20,5 +20,3 @@ data class MovieWithFavorite(
     val movie: MovieEntity,
     val isFavorite: Boolean
 )
-
-

@@ -35,14 +35,16 @@ fun AddScreen(
     val isFormValid = title.isNotBlank() &&
             genre.isNotBlank() &&
             synopsis.isNotBlank() &&
-            duration.isNotBlank() && // duración no vacía
-            duration.toIntOrNull() != null && // duración debe ser número válido
+            duration.isNotBlank() &&
+            duration.toIntOrNull() != null &&
             director.isNotBlank()
 
     ScaffoldLayout(
         userName = userName.toString(),
         navController = navController,
-        currentRoute = "add"
+        currentRoute = "add",
+        showBackButton = true,
+        onBackClick = { navController.popBackStack() }
     ) { paddingValues ->
         Scaffold(
             modifier = Modifier.padding(paddingValues)
@@ -100,7 +102,6 @@ fun AddScreen(
                 OutlinedTextField(
                     value = duration,
                     onValueChange = { newValue ->
-                        // Solo permitir números (filtrar cualquier cosa que no sea dígito)
                         if (newValue.all { it.isDigit() }) {
                             duration = newValue
                         }
@@ -123,7 +124,7 @@ fun AddScreen(
                 Row {
                     Button(
                         onClick = {
-                            val dur = duration.toInt() // seguro porque validamos antes
+                            val dur = duration.toInt()
                             addEditViewModel.saveMovie(
                                 title = title.trim(),
                                 genre = genre.uppercase(),
@@ -140,8 +141,6 @@ fun AddScreen(
                     ) {
                         Text("Guardar")
                     }
-
-
                     OutlinedButton(onClick = {
                         navController.navigate("main") {
                             popUpTo("main") { inclusive = true }
@@ -149,9 +148,9 @@ fun AddScreen(
                     }) {
                         Text("Cancelar")
                     }
-
                 }
             }
         }
     }
 }
+

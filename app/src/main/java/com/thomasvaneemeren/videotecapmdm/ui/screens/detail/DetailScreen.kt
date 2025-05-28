@@ -26,6 +26,7 @@ fun DetailScreen(
 ) {
     val movie by viewModel.getMovieById(movieId).collectAsState(initial = null)
     val userName by userPreferencesViewModel.userName.collectAsState(initial = "")
+    val isFavorite by viewModel.isFavorite(movieId).collectAsState(initial = false)
 
     movie?.let {
         ScaffoldLayout(
@@ -69,7 +70,7 @@ fun DetailScreen(
                 DetailText(label = "Género", value = it.genre)
                 DetailText(label = "Director", value = it.director)
                 DetailText(label = "Duración", value = "${it.duration} min")
-                DetailText(label = "Favorita", value = if (it.isFavorite) "Sí" else "No")
+                DetailText(label = "Favorita", value = if (isFavorite) "Sí" else "No")
 
                 Spacer(modifier = Modifier.height(16.dp))
                 Text("Sinopsis", style = MaterialTheme.typography.titleMedium)

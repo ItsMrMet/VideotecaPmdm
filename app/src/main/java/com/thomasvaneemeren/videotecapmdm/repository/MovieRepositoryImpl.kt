@@ -10,9 +10,15 @@ class MovieRepositoryImpl(
 ) : MovieRepository {
     override fun getAllMovies(): Flow<List<MovieEntity>> = movieDao.getAllMovies()
 
+    fun getMoviesByUser(userId: String): Flow<List<MovieEntity>> {
+        return movieDao.getMoviesByUser(userId)
+    }
+
     override fun getMovieByIdFlow(id: Int): Flow<MovieEntity?> = movieDao.getMovieByIdFlow(id)
 
-    override suspend fun insertMovie(movie: MovieEntity) = movieDao.insert(movie)
+    override suspend fun insertMovie(movie: MovieEntity): Long {
+        return movieDao.insert(movie)
+    }
 
     override suspend fun updateMovie(movie: MovieEntity) = movieDao.update(movie)
 
