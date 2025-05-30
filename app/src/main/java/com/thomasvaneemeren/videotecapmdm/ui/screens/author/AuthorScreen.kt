@@ -2,9 +2,9 @@ package com.thomasvaneemeren.videotecapmdm.ui.screens.author
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -30,13 +30,15 @@ fun AuthorScreen(
         showBackButton = true,
         onBackClick = { navController.popBackStack() }
     ) { padding ->
+        // Scroll vertical para evitar overflow
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .padding(24.dp),
+                .padding(24.dp)
+                .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterVertically)
         ) {
             Image(
                 painter = painterResource(id = R.drawable.author_photo_pmdm),
@@ -46,12 +48,10 @@ fun AuthorScreen(
                     .clip(CircleShape),
                 contentScale = ContentScale.Crop
             )
-            Spacer(modifier = Modifier.height(16.dp))
             Text(
                 text = "Thomas Van Eemeren",
                 style = MaterialTheme.typography.headlineMedium
             )
-            Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = "Desarrollador de la Videoteca PMDM",
                 style = MaterialTheme.typography.bodyLarge
@@ -59,3 +59,4 @@ fun AuthorScreen(
         }
     }
 }
+

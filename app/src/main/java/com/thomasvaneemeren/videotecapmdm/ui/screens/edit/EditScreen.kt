@@ -1,7 +1,9 @@
 package com.thomasvaneemeren.videotecapmdm.ui.screens.edit
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -91,12 +93,13 @@ fun EditScreen(
             ) { innerPadding ->
                 Column(
                     modifier = Modifier
+                        .fillMaxSize()
                         .padding(innerPadding)
                         .padding(16.dp)
-                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState()),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     OutlinedTextField(value = title, onValueChange = { title = it }, label = { Text("Título") })
-                    Spacer(modifier = Modifier.height(8.dp))
 
                     ExposedDropdownMenuBox(
                         expanded = expanded,
@@ -128,22 +131,39 @@ fun EditScreen(
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(8.dp))
                     OutlinedTextField(value = synopsis, onValueChange = { synopsis = it }, label = { Text("Sinopsis") })
-                    Spacer(modifier = Modifier.height(8.dp))
+
                     OutlinedTextField(
                         value = duration,
                         onValueChange = { duration = it },
                         label = { Text("Duración (min)") },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
                     )
-                    Spacer(modifier = Modifier.height(8.dp))
+
                     OutlinedTextField(value = director, onValueChange = { director = it }, label = { Text("Director") })
-                    Spacer(modifier = Modifier.height(8.dp))
+
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Checkbox(checked = isFavorite, onCheckedChange = { isFavorite = it })
                         Spacer(modifier = Modifier.width(8.dp))
                         Text("Marcar como favorita")
+                    }
+
+                    var isAdmin by remember { mutableStateOf(false) }
+                    LaunchedEffect(Unit) {
+                        isAdmin = addEditViewModel.isAdmin()
+                    }
+
+                    if (isAdmin) {
+                        Button(
+                            onClick = {
+                                addEditViewModel.deleteMovie {
+                                    navController.popBackStack()
+                                }
+                            },
+                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
+                        ) {
+                            Text("Eliminar", color = MaterialTheme.colorScheme.onError)
+                        }
                     }
                 }
             }
@@ -152,4 +172,6 @@ fun EditScreen(
         CircularProgressIndicator()
     }
 }
+
+
 

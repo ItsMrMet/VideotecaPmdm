@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.thomasvaneemeren.videotecapmdm.data.datastore.UserPreferencesRepository
 import com.thomasvaneemeren.videotecapmdm.data.database.DatabaseFactory
 import com.thomasvaneemeren.videotecapmdm.data.entities.MovieEntity
-import com.thomasvaneemeren.videotecapmdm.data.repository.MovieRepositoryImpl
+import com.thomasvaneemeren.videotecapmdm.repository.MovieRepositoryImpl
 import com.thomasvaneemeren.videotecapmdm.repository.UserFavoriteRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
@@ -13,10 +13,11 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
+@OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
 class MainViewModel @Inject constructor(
     private val userPreferencesRepository: UserPreferencesRepository,
-    private val databaseFactory: DatabaseFactory,
-    private val userFavoriteRepository: UserFavoriteRepository
+    private val userFavoriteRepository: UserFavoriteRepository,
+    private val databaseFactory: DatabaseFactory
 ) : ViewModel() {
 
     private val _userName = MutableStateFlow<String?>(null)
@@ -27,28 +28,21 @@ class MainViewModel @Inject constructor(
 
     private val _searchQuery = MutableStateFlow("")
 
-
-    // Todas las películas para el usuario actual
     private val allMovies: StateFlow<List<MovieEntity>> = _userName
         .filterNotNull()
-        .flatMapLatest { user ->
-            val db = databaseFactory.createDatabase(user)
+        .flatMapLatest {
+            val db = databaseFactory.createDatabase()
             val repo = MovieRepositoryImpl(db.movieDao())
-            repo.getMoviesByUser(user)
+            repo.getAllMovies()
         }
         .stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
-    // Favoritos del usuario actual
     val favoriteIdsFlow: Flow<Set<Int>> = _userName
         .filterNotNull()
         .flatMapLatest { user ->
-            userFavoriteRepository.getFavoriteMovieIds(user).map { list ->
-                list.toSet()
-            }
+            userFavoriteRepository.getFavoriteMovieIds(user).map { it.toSet() }
         }
 
-
-    // Lista combinada y filtrada para mostrar
     val movies: StateFlow<List<MovieEntity>> = combine(
         allMovies,
         _favoritesOnly,
@@ -56,22 +50,19 @@ class MainViewModel @Inject constructor(
         _searchQuery
     ) { movies, favoritesOnly, favoriteIds, query ->
         var filtered = movies
-
         if (favoritesOnly) {
             filtered = filtered.filter { it.id in favoriteIds }
         }
-
         if (query.isNotBlank()) {
             filtered = filtered.filter { it.title.contains(query, ignoreCase = true) }
         }
-
         filtered
     }.stateIn(viewModelScope, SharingStarted.Lazily, emptyList())
 
     init {
         viewModelScope.launch {
             userPreferencesRepository.userNameFlow.collect {
-                _userName.value = it
+                _userName.value = it?.lowercase() // <-- NORMALIZA también aquí
             }
         }
     }
@@ -84,9 +75,8 @@ class MainViewModel @Inject constructor(
         }
     }
 
-
     fun logout() = viewModelScope.launch {
-        userPreferencesRepository.clearUserName()
+        userPreferencesRepository.clearUserData()
     }
 
     fun toggleFavoritesOnly() {

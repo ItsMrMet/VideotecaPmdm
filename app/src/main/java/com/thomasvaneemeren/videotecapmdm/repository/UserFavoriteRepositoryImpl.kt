@@ -11,15 +11,16 @@ class UserFavoriteRepositoryImpl @Inject constructor(
 ) : UserFavoriteRepository {
 
     override suspend fun isFavorite(userId: String, movieId: Int): Boolean {
-        return userFavoriteDao.isFavorite(userId, movieId).firstOrNull() != null
+        return userFavoriteDao.isFavorite(userId.lowercase(), movieId).firstOrNull() != null
     }
 
     override fun getFavoriteMovieIds(userId: String): Flow<List<Int>> {
-        return userFavoriteDao.getFavoriteMovieIds(userId)
+        return userFavoriteDao.getFavoriteMovieIds(userId.lowercase())
     }
 
     override suspend fun setFavorite(userId: String, movieId: Int, isFavorite: Boolean) {
-        val favorite = UserFavoriteEntity(userId = userId, movieId = movieId)
+        val normalizedUser = userId.lowercase()
+        val favorite = UserFavoriteEntity(userId = normalizedUser, movieId = movieId)
         if (isFavorite) {
             userFavoriteDao.insert(favorite)
         } else {

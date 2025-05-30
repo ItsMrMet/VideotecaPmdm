@@ -1,5 +1,6 @@
 package com.thomasvaneemeren.videotecapmdm.ui.screens.main
 
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
@@ -10,6 +11,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.thomasvaneemeren.videotecapmdm.navigation.Screen
@@ -26,8 +28,8 @@ fun MainScreen(
     val favoriteIds by viewModel.favoriteIdsFlow.collectAsState(initial = emptySet())
     val userName by viewModel.userName.collectAsState()
     val favoritesOnly by viewModel.favoritesOnly.collectAsState()
-
     var searchQuery by remember { mutableStateOf("") }
+    val isLandscape = LocalConfiguration.current.orientation == Configuration.ORIENTATION_LANDSCAPE
 
     ScaffoldLayout(
         userName = userName,
@@ -35,38 +37,31 @@ fun MainScreen(
         currentRoute = Screen.Main.route
     ) { padding ->
 
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(padding)
-        ) {
-            Column(
+        if (isLandscape) {
+            Row(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(16.dp)
+                    .padding(padding)
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.fillMaxWidth()
+                Column(
+                    modifier = Modifier
+                        .weight(0.35f)
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    OutlinedTextField(
+                    TextField(
                         value = searchQuery,
                         onValueChange = {
                             searchQuery = it
                             viewModel.setSearchQuery(it)
                         },
                         label = { Text("Buscar película") },
-                        modifier = Modifier.weight(1f),
-                        singleLine = true
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth()
                     )
-
-                    Spacer(modifier = Modifier.width(8.dp))
-
                     IconToggleButton(
                         checked = favoritesOnly,
-                        onCheckedChange = {
-                            viewModel.toggleFavoritesOnly()
-                        }
+                        onCheckedChange = { viewModel.toggleFavoritesOnly() }
                     ) {
                         Icon(
                             imageVector = if (favoritesOnly) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
@@ -75,44 +70,96 @@ fun MainScreen(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
-
-                if (movies.isEmpty()) {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text("No se encontraron películas.")
-                    }
-                } else {
-                    LazyColumn(
-                        verticalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        items(movies.size) { index ->
-                            val movie = movies[index]
-                            MovieCard(
-                                movie = movie,
-                                isFavorite = favoriteIds.contains(movie.id),
-                                onToggleFavorite = {
-                                    viewModel.toggleFavorite(movie.id)
-                                },
-                                onClick = {
-                                    navController.navigate("detail/${movie.id}")
-                                }
-                            )
-                        }
+                LazyColumn(
+                    modifier = Modifier
+                        .weight(0.65f)
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(movies.size) { index ->
+                        val movie = movies[index]
+                        MovieCard(
+                            movie = movie,
+                            isFavorite = movie.id in favoriteIds,
+                            onToggleFavorite = { viewModel.toggleFavorite(movie.id) },
+                            onClick = { navController.navigate("detail/${movie.id}") }
+                        )
                     }
                 }
             }
 
-            FloatingActionButton(
-                onClick = { navController.navigate(Screen.Add.route) },
-                containerColor = MaterialTheme.colorScheme.primary,
+        } else {
+            Box(
                 modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(16.dp)
+                    .fillMaxSize()
+                    .padding(padding)
             ) {
-                Icon(Icons.Default.Add, contentDescription = "Añadir película")
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(16.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        TextField(
+                            value = searchQuery,
+                            onValueChange = {
+                                searchQuery = it
+                                viewModel.setSearchQuery(it)
+                            },
+                            label = { Text("Buscar película") },
+                            singleLine = true,
+                            modifier = Modifier.weight(1f)
+                        )
+
+                        IconToggleButton(
+                            checked = favoritesOnly,
+                            onCheckedChange = { viewModel.toggleFavoritesOnly() }
+                        ) {
+                            Icon(
+                                imageVector = if (favoritesOnly) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                                contentDescription = "Mostrar solo favoritos"
+                            )
+                        }
+                    }
+
+                    if (movies.isEmpty()) {
+                        Box(
+                            modifier = Modifier.fillMaxSize(),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text("No se encontraron películas.")
+                        }
+                    } else {
+                        LazyColumn(
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            items(movies.size) { index ->
+                                val movie = movies[index]
+                                MovieCard(
+                                    movie = movie,
+                                    isFavorite = movie.id in favoriteIds,
+                                    onToggleFavorite = { viewModel.toggleFavorite(movie.id) },
+                                    onClick = { navController.navigate("detail/${movie.id}") }
+                                )
+                            }
+                        }
+                    }
+                }
+
+                FloatingActionButton(
+                    onClick = { navController.navigate(Screen.Add.route) },
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(16.dp)
+                ) {
+                    Icon(Icons.Default.Add, contentDescription = "Añadir película")
+                }
             }
         }
     }

@@ -7,7 +7,7 @@ import androidx.datastore.preferences.preferencesDataStore
 import com.thomasvaneemeren.videotecapmdm.data.database.DatabaseFactory
 import com.thomasvaneemeren.videotecapmdm.data.database.dao.UserFavoriteDao
 import com.thomasvaneemeren.videotecapmdm.data.datastore.UserPreferencesRepository
-import com.thomasvaneemeren.videotecapmdm.data.repository.MovieRepositoryImpl
+import com.thomasvaneemeren.videotecapmdm.repository.MovieRepositoryImpl
 import com.thomasvaneemeren.videotecapmdm.repository.MovieRepository
 import com.thomasvaneemeren.videotecapmdm.repository.UserFavoriteRepository
 import com.thomasvaneemeren.videotecapmdm.repository.UserFavoriteRepositoryImpl
@@ -44,24 +44,21 @@ object AppModule {
 
     @Provides
     @Singleton
+    fun provideUserFavoriteDao(databaseFactory: DatabaseFactory): UserFavoriteDao {
+        val db = databaseFactory.createDatabase()
+        return db.userFavoriteDao()
+    }
+
+    @Provides
+    @Singleton
     fun provideUserFavoriteRepository(
         userFavoriteDao: UserFavoriteDao
     ): UserFavoriteRepository = UserFavoriteRepositoryImpl(userFavoriteDao)
 
     @Provides
     @Singleton
-    fun provideUserFavoriteDao(databaseFactory: DatabaseFactory, userPreferencesRepository: UserPreferencesRepository): UserFavoriteDao {
-        val db = databaseFactory.createDatabase("default_user") // deberías obtener el real
-        return db.userFavoriteDao()
-    }
-
-    @Provides
-    @Singleton
     fun provideMovieRepository(databaseFactory: DatabaseFactory): MovieRepository {
-        val db = databaseFactory.createDatabase("default_user")
+        val db = databaseFactory.createDatabase()
         return MovieRepositoryImpl(db.movieDao())
     }
-
-
-
 }

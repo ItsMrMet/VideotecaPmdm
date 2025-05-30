@@ -6,9 +6,9 @@ import kotlinx.coroutines.flow.Flow
 interface MovieRepository {
     fun getAllMovies(): Flow<List<MovieEntity>>
     fun getMovieByIdFlow(id: Int): Flow<MovieEntity?>
+    suspend fun getMovieById(id: Int): MovieEntity? // <-- AGREGADO
     suspend fun insertMovie(movie: MovieEntity): Long
     suspend fun updateMovie(movie: MovieEntity)
     suspend fun deleteMovie(movie: MovieEntity)
-    suspend fun getMovieById(id: Int, userId: String): MovieEntity?
 }
 

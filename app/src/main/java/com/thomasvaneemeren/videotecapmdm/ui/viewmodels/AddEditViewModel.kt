@@ -5,13 +5,10 @@ import androidx.lifecycle.viewModelScope
 import com.thomasvaneemeren.videotecapmdm.data.database.DatabaseFactory
 import com.thomasvaneemeren.videotecapmdm.data.datastore.UserPreferencesRepository
 import com.thomasvaneemeren.videotecapmdm.data.entities.MovieEntity
-import com.thomasvaneemeren.videotecapmdm.data.repository.MovieRepositoryImpl
+import com.thomasvaneemeren.videotecapmdm.repository.MovieRepositoryImpl
 import com.thomasvaneemeren.videotecapmdm.repository.UserFavoriteRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -25,23 +22,34 @@ class AddEditViewModel @Inject constructor(
     private val _movie = MutableStateFlow<MovieEntity?>(null)
     val movie: StateFlow<MovieEntity?> = _movie
 
-    private suspend fun getRepository(): MovieRepositoryImpl? {
-        val user = userPreferencesRepository.getUserName() ?: return null
-        val db = databaseFactory.createDatabase(user)
-        return MovieRepositoryImpl(db.movieDao())
+    private suspend fun getRepository(): MovieRepositoryImpl {
+        return MovieRepositoryImpl(databaseFactory.createDatabase().movieDao())
     }
 
     fun loadMovie(id: Int) {
         viewModelScope.launch {
-            val repo = getRepository() ?: return@launch
-            val user = userPreferencesRepository.getUserName() ?: return@launch
-            _movie.value = repo.getMovieById(id, user)
+            val repo = getRepository()
+            _movie.value = repo.getMovieById(id)
         }
     }
 
     fun isFavorite(movieId: Int): Flow<Boolean> = flow {
         val user = userPreferencesRepository.getUserName() ?: return@flow
         emit(userFavoriteRepository.isFavorite(user, movieId))
+    }
+
+    suspend fun isAdmin(): Boolean {
+        return userPreferencesRepository.isAdmin()
+    }
+
+    fun deleteMovie(onDeleted: () -> Unit) {
+        viewModelScope.launch {
+            if (!userPreferencesRepository.isAdmin()) return@launch
+            val movieToDelete = _movie.value ?: return@launch
+            val repo = getRepository()
+            repo.deleteMovie(movieToDelete)
+            onDeleted()
+        }
     }
 
     fun saveMovie(
@@ -54,12 +62,11 @@ class AddEditViewModel @Inject constructor(
     ) {
         viewModelScope.launch {
             val user = userPreferencesRepository.getUserName() ?: return@launch
-            val db = databaseFactory.createDatabase(user)
+            val db = databaseFactory.createDatabase()
             val dao = db.movieDao()
 
             val currentMovie = movie.value
             if (currentMovie != null) {
-                // Editar película existente
                 val updated = currentMovie.copy(
                     title = title,
                     genre = genre,
@@ -70,24 +77,18 @@ class AddEditViewModel @Inject constructor(
                 dao.update(updated)
                 userFavoriteRepository.setFavorite(user, updated.id, isFavorite)
             } else {
-                // Insertar nueva película
                 val newMovie = MovieEntity(
                     title = title,
                     genre = genre,
                     synopsis = synopsis,
                     duration = duration,
-                    director = director,
-                    userId = user
+                    director = director
                 )
                 val id = dao.insert(newMovie)
-
-                // Guardar favorito si es necesario
                 if (isFavorite && id > 0) {
                     userFavoriteRepository.setFavorite(user, id.toInt(), true)
                 }
             }
         }
     }
-
 }
-

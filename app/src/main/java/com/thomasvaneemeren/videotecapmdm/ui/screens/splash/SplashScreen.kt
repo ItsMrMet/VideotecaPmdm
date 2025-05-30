@@ -12,12 +12,12 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import kotlinx.coroutines.delay
-import com.thomasvaneemeren.videotecapmdm.ui.viewmodels.SplashViewModel
+import com.thomasvaneemeren.videotecapmdm.ui.viewmodels.UserPreferencesViewModel
 
 @Composable
 fun SplashScreen(
     navController: NavController,
-    viewModel: SplashViewModel = hiltViewModel()
+    viewModel: UserPreferencesViewModel = hiltViewModel()
 ) {
     val userName by viewModel.userName.collectAsState()
 
@@ -28,6 +28,7 @@ fun SplashScreen(
                 popUpTo("splash") { inclusive = true }
             }
         } else {
+            viewModel.login(userName)
             navController.navigate("main") {
                 popUpTo("splash") { inclusive = true }
             }
@@ -41,7 +42,6 @@ fun SplashScreen(
         Text(
             text = "Videoteca",
             style = MaterialTheme.typography.displayLarge,
-            fontSize = 48.sp,
             textAlign = TextAlign.Center
         )
     }

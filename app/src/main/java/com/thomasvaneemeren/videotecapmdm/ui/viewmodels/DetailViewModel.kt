@@ -5,11 +5,9 @@ import androidx.lifecycle.viewModelScope
 import com.thomasvaneemeren.videotecapmdm.data.database.DatabaseFactory
 import com.thomasvaneemeren.videotecapmdm.data.datastore.UserPreferencesRepository
 import com.thomasvaneemeren.videotecapmdm.data.entities.MovieEntity
-import com.thomasvaneemeren.videotecapmdm.data.repository.MovieRepositoryImpl
 import com.thomasvaneemeren.videotecapmdm.repository.UserFavoriteRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -21,11 +19,10 @@ class DetailViewModel @Inject constructor(
     private val userFavoriteRepository: UserFavoriteRepository
 ) : ViewModel() {
 
+    private val db by lazy { databaseFactory.createDatabase() }
+
     fun getMovieById(id: Int): Flow<MovieEntity?> = flow {
-        val user = userPreferencesRepository.getUserName() ?: return@flow
-        val db = databaseFactory.createDatabase(user)
-        val movie = db.movieDao().getMovieById(id, user)
-        emit(movie)
+        emit(db.movieDao().getMovieById(id))
     }
 
     fun isFavorite(movieId: Int): Flow<Boolean> = flow {
@@ -35,12 +32,13 @@ class DetailViewModel @Inject constructor(
 
     fun deleteMovie(movie: MovieEntity) {
         viewModelScope.launch {
-            val user = userPreferencesRepository.getUserName() ?: return@launch
-            val db = databaseFactory.createDatabase(user)
+            val user = userPreferencesRepository.getUserName()?.lowercase() ?: return@launch
+            if (user != "thomas") return@launch
+
             db.movieDao().delete(movie)
             userFavoriteRepository.setFavorite(user, movie.id, false)
         }
     }
-}
 
+}
 
