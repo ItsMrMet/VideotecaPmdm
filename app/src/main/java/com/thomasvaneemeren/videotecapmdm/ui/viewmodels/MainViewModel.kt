@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.thomasvaneemeren.videotecapmdm.data.datastore.UserPreferencesRepository
 import com.thomasvaneemeren.videotecapmdm.data.database.DatabaseFactory
-import com.thomasvaneemeren.videotecapmdm.data.entities.MovieEntity
+import com.thomasvaneemeren.videotecapmdm.data.database.entities.MovieEntity
 import com.thomasvaneemeren.videotecapmdm.repository.MovieRepositoryImpl
 import com.thomasvaneemeren.videotecapmdm.repository.UserFavoriteRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -62,7 +62,7 @@ class MainViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             userPreferencesRepository.userNameFlow.collect {
-                _userName.value = it?.lowercase() // <-- NORMALIZA también aquí
+                _userName.value = it?.lowercase()
             }
         }
     }
@@ -73,10 +73,6 @@ class MainViewModel @Inject constructor(
             val isFav = userFavoriteRepository.isFavorite(userId, movieId)
             userFavoriteRepository.setFavorite(userId, movieId, !isFav)
         }
-    }
-
-    fun logout() = viewModelScope.launch {
-        userPreferencesRepository.clearUserData()
     }
 
     fun toggleFavoritesOnly() {

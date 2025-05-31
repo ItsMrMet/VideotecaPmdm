@@ -36,10 +36,6 @@ class UserPreferencesViewModel @Inject constructor(
             repository.setUserRole(role)
         }
     }
-
-    suspend fun logout() {
-        repository.clearUserData()
-    }
 }
 
 

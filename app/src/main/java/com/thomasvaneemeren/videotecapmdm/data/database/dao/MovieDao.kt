@@ -1,7 +1,7 @@
 package com.thomasvaneemeren.videotecapmdm.data.database.dao
 
 import androidx.room.*
-import com.thomasvaneemeren.videotecapmdm.data.entities.MovieEntity
+import com.thomasvaneemeren.videotecapmdm.data.database.entities.MovieEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -24,6 +24,4 @@ interface MovieDao {
     @Delete
     suspend fun delete(movie: MovieEntity)
 }
-
-
 

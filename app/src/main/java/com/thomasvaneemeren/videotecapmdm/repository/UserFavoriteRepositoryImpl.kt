@@ -1,7 +1,7 @@
 package com.thomasvaneemeren.videotecapmdm.repository
 
 import com.thomasvaneemeren.videotecapmdm.data.database.dao.UserFavoriteDao
-import com.thomasvaneemeren.videotecapmdm.data.entities.UserFavoriteEntity
+import com.thomasvaneemeren.videotecapmdm.data.database.entities.UserFavoriteEntity
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import javax.inject.Inject

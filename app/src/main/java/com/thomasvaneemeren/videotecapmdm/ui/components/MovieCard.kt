@@ -11,7 +11,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
-import com.thomasvaneemeren.videotecapmdm.data.entities.MovieEntity
+import com.thomasvaneemeren.videotecapmdm.data.database.entities.MovieEntity
 
 @Composable
 fun MovieCard(
@@ -104,4 +104,3 @@ fun MovieCard(
         }
     }
 }
-

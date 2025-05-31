@@ -5,7 +5,7 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.thomasvaneemeren.videotecapmdm.data.entities.UserFavoriteEntity
+import com.thomasvaneemeren.videotecapmdm.data.database.entities.UserFavoriteEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao

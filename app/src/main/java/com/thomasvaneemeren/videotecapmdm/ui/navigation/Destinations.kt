@@ -1,4 +1,4 @@
-package com.thomasvaneemeren.videotecapmdm.navigation
+package com.thomasvaneemeren.videotecapmdm.ui.navigation
 
 sealed class Screen(val route: String) {
     object Splash : Screen("splash")

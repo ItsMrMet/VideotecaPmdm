@@ -17,7 +17,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.thomasvaneemeren.videotecapmdm.R
-import com.thomasvaneemeren.videotecapmdm.navigation.Screen
+import com.thomasvaneemeren.videotecapmdm.ui.navigation.Screen
 import com.thomasvaneemeren.videotecapmdm.ui.components.ScaffoldLayout
 
 @OptIn(ExperimentalMaterial3Api::class)

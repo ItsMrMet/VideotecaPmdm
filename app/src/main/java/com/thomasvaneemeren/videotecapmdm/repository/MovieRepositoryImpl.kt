@@ -1,7 +1,7 @@
 package com.thomasvaneemeren.videotecapmdm.repository
 
 import com.thomasvaneemeren.videotecapmdm.data.database.dao.MovieDao
-import com.thomasvaneemeren.videotecapmdm.data.entities.MovieEntity
+import com.thomasvaneemeren.videotecapmdm.data.database.entities.MovieEntity
 import kotlinx.coroutines.flow.Flow
 
 class MovieRepositoryImpl(

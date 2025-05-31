@@ -5,8 +5,8 @@ import androidx.room.*
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.thomasvaneemeren.videotecapmdm.data.database.dao.MovieDao
 import com.thomasvaneemeren.videotecapmdm.data.database.dao.UserFavoriteDao
-import com.thomasvaneemeren.videotecapmdm.data.entities.MovieEntity
-import com.thomasvaneemeren.videotecapmdm.data.entities.UserFavoriteEntity
+import com.thomasvaneemeren.videotecapmdm.data.database.entities.MovieEntity
+import com.thomasvaneemeren.videotecapmdm.data.database.entities.UserFavoriteEntity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch

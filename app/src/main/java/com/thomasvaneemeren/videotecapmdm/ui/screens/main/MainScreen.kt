@@ -18,14 +18,11 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.thomasvaneemeren.videotecapmdm.navigation.Screen
+import com.thomasvaneemeren.videotecapmdm.ui.navigation.Screen
 import com.thomasvaneemeren.videotecapmdm.ui.components.MovieCard
 import com.thomasvaneemeren.videotecapmdm.ui.components.ScaffoldLayout
 import com.thomasvaneemeren.videotecapmdm.ui.viewmodels.MainViewModel
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.foundation.lazy.items
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState

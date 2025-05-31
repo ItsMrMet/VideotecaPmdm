@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.thomasvaneemeren.videotecapmdm.data.database.DatabaseFactory
 import com.thomasvaneemeren.videotecapmdm.data.datastore.UserPreferencesRepository
-import com.thomasvaneemeren.videotecapmdm.data.entities.MovieEntity
+import com.thomasvaneemeren.videotecapmdm.data.database.entities.MovieEntity
 import com.thomasvaneemeren.videotecapmdm.repository.UserFavoriteRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
@@ -39,6 +39,5 @@ class DetailViewModel @Inject constructor(
             userFavoriteRepository.setFavorite(user, movie.id, false)
         }
     }
-
 }
 

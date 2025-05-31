@@ -2,7 +2,6 @@ package com.thomasvaneemeren.videotecapmdm.ui.screens.detail
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -16,12 +15,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
-import com.thomasvaneemeren.videotecapmdm.data.entities.MovieEntity
-import com.thomasvaneemeren.videotecapmdm.navigation.Screen
+import com.thomasvaneemeren.videotecapmdm.ui.navigation.Screen
 import com.thomasvaneemeren.videotecapmdm.ui.components.ScaffoldLayout
 import com.thomasvaneemeren.videotecapmdm.ui.viewmodels.DetailViewModel
 import com.thomasvaneemeren.videotecapmdm.ui.viewmodels.UserPreferencesViewModel

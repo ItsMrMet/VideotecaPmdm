@@ -1,4 +1,4 @@
-package com.thomasvaneemeren.videotecapmdm.navigation
+package com.thomasvaneemeren.videotecapmdm.ui.navigation
 
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
@@ -8,7 +8,7 @@ import androidx.navigation.NavHostController
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
-import com.thomasvaneemeren.videotecapmdm.ui.screens.SplashScreen
+import com.thomasvaneemeren.videotecapmdm.ui.screens.splash.SplashScreen
 import com.thomasvaneemeren.videotecapmdm.ui.screens.add.AddScreen
 import com.thomasvaneemeren.videotecapmdm.ui.screens.author.AuthorScreen
 import com.thomasvaneemeren.videotecapmdm.ui.screens.detail.DetailScreen

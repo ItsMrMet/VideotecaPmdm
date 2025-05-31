@@ -1,4 +1,4 @@
-package com.thomasvaneemeren.videotecapmdm.data.entities
+package com.thomasvaneemeren.videotecapmdm.data.database.entities
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
