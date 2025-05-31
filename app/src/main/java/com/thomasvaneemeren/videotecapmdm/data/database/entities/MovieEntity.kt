@@ -11,10 +11,5 @@ data class MovieEntity(
     val synopsis: String,
     val duration: Int,
     val director: String,
-    val userId: String? = null // 🔧 ESTE CAMPO ES IMPORTANTE
-)
-
-data class MovieWithFavorite(
-    val movie: MovieEntity,
-    val isFavorite: Boolean
+    val userId: String? = null
 )

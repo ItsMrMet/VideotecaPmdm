@@ -75,6 +75,9 @@ dependencies {
     implementation("androidx.compose.material:material-icons-extended")
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.6.2")
 
+    implementation("com.google.accompanist:accompanist-navigation-animation:0.32.0")
+
+
     // Navigation
     implementation("androidx.navigation:navigation-compose:2.7.4")
 

@@ -12,7 +12,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 @Database(entities = [MovieEntity::class, UserFavoriteEntity::class], version = 1)
-@TypeConverters(Converters::class)
 abstract class VideotecaDatabase : RoomDatabase() {
     abstract fun movieDao(): MovieDao
     abstract fun userFavoriteDao(): UserFavoriteDao

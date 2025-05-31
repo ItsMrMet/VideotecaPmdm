@@ -1,5 +1,10 @@
 package com.thomasvaneemeren.videotecapmdm.ui.screens.add
 
+import androidx.compose.animation.*
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
@@ -9,17 +14,22 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.thomasvaneemeren.videotecapmdm.data.model.getGenreList
+import com.thomasvaneemeren.videotecapmdm.navigation.Screen
 import com.thomasvaneemeren.videotecapmdm.ui.viewmodels.AddEditViewModel
 import com.thomasvaneemeren.videotecapmdm.ui.components.ScaffoldLayout
 import com.thomasvaneemeren.videotecapmdm.ui.viewmodels.UserPreferencesViewModel
+import com.thomasvaneemeren.videotecapmdm.ui.components.FormFields
+import com.thomasvaneemeren.videotecapmdm.ui.components.FormButtons
+import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalAnimationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun AddScreen(
     navController: NavHostController,
@@ -43,226 +53,146 @@ fun AddScreen(
             duration.toIntOrNull() != null &&
             director.isNotBlank()
 
-    val configuration = LocalConfiguration.current
-    val isLandscape = configuration.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE
+    val scope = rememberCoroutineScope()
 
     ScaffoldLayout(
         userName = userName,
         navController = navController,
-        currentRoute = "add",
+        currentRoute = Screen.Add.route,
         showBackButton = true,
         onBackClick = { navController.popBackStack() }
     ) { paddingValues ->
 
-        if (isLandscape) {
-            Row(
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .padding(24.dp),
+            contentAlignment = Alignment.TopCenter
+        ) {
+            Column(
                 modifier = Modifier
-                    .padding(paddingValues)
-                    .fillMaxSize()
-                    .padding(24.dp),
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    .verticalScroll(rememberScrollState())
+                    .widthIn(max = 600.dp)
+                    .fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Column(
-                    modifier = Modifier
-                        .weight(1f)
-                        .verticalScroll(rememberScrollState())
+                // Título animado
+                AnimatedVisibility(
+                    visible = true,
+                    enter = fadeIn(animationSpec = tween(700)) + slideInVertically(
+                        initialOffsetY = { it / 2 },
+                        animationSpec = tween(700)
+                    )
                 ) {
-                    FormFields(
-                        title = title,
-                        onTitleChange = { title = it },
-                        genre = genre,
-                        onGenreChange = { genre = it },
-                        expandedGenre = expandedGenre,
-                        onExpandedChange = { expandedGenre = it },
-                        genres = genres,
-                        synopsis = synopsis,
-                        onSynopsisChange = { synopsis = it },
-                        duration = duration,
-                        onDurationChange = { duration = it },
-                        director = director,
-                        onDirectorChange = { director = it },
-                        isFavorite = isFavorite,
-                        onFavoriteChange = { isFavorite = it }
+                    Text(
+                        text = "Añadir Película",
+                        style = MaterialTheme.typography.headlineMedium,
+                        color = MaterialTheme.colorScheme.onBackground
                     )
                 }
-                Column(
-                    modifier = Modifier
-                        .weight(1f)
-                        .fillMaxHeight(),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
+
+                // Card con campos y animación de aparición
+                AnimatedVisibility(
+                    visible = true,
+                    enter = fadeIn(animationSpec = tween(800)) + slideInVertically(
+                        initialOffsetY = { it / 3 },
+                        animationSpec = tween(800)
+                    )
+                ) {
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.surfaceVariant
+                        ),
+                        shape = MaterialTheme.shapes.medium
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            // FormFields con animación para dropdown de género
+                            FormFields(
+                                title = title,
+                                onTitleChange = { title = it },
+                                genre = genre,
+                                onGenreChange = { genre = it },
+                                expandedGenre = expandedGenre,
+                                onExpandedChange = { expandedGenre = it },
+                                genres = genres,
+                                synopsis = synopsis,
+                                onSynopsisChange = { synopsis = it },
+                                duration = duration,
+                                onDurationChange = { duration = it },
+                                director = director,
+                                onDirectorChange = { director = it },
+                                isFavorite = isFavorite,
+                                onFavoriteChange = { isFavorite = it }
+                            )
+                        }
+                    }
+                }
+
+                // Botones con animación y efecto de escala al pulsar
+                val interactionSourceSave = remember { MutableInteractionSource() }
+                val isPressedSave by interactionSourceSave.collectIsFocusedAsState()
+                val scaleSave by animateFloatAsState(
+                    targetValue = if (isPressedSave) 0.95f else 1f,
+                    animationSpec = tween(100),
+                    label = "buttonScaleSave"
+                )
+
+                val interactionSourceCancel = remember { MutableInteractionSource() }
+                val isPressedCancel by interactionSourceCancel.collectIsFocusedAsState()
+                val scaleCancel by animateFloatAsState(
+                    targetValue = if (isPressedCancel) 0.95f else 1f,
+                    animationSpec = tween(100),
+                    label = "buttonScaleCancel"
+                )
+
+                AnimatedVisibility(
+                    visible = true,
+                    enter = fadeIn(animationSpec = tween(900)) + slideInVertically(
+                        initialOffsetY = { it / 4 },
+                        animationSpec = tween(900)
+                    )
                 ) {
                     FormButtons(
                         isFormValid = isFormValid,
                         onSave = {
-                            addEditViewModel.saveMovie(
-                                title = title.trim(),
-                                genre = genre.uppercase(),
-                                synopsis = synopsis.trim(),
-                                duration = duration.toInt(),
-                                director = director.trim(),
-                                isFavorite = isFavorite
-                            )
-                            navController.navigate("main") {
-                                popUpTo("main") { inclusive = true }
+                            scope.launch {
+                                addEditViewModel.saveMovie(
+                                    title = title.trim(),
+                                    genre = genre.uppercase(),
+                                    synopsis = synopsis.trim(),
+                                    duration = duration.toInt(),
+                                    director = director.trim(),
+                                    isFavorite = isFavorite
+                                )
+                                navController.navigate(Screen.Main.route) {
+                                    popUpTo("main") { inclusive = true }
+                                }
                             }
                         },
                         onCancel = {
-                            navController.navigate("main") {
+                            navController.navigate(Screen.Main.route) {
                                 popUpTo("main") { inclusive = true }
                             }
-                        }
+                        },
+                        modifierSave = Modifier
+                            .scale(scaleSave)
+                            .then(Modifier),
+                        modifierCancel = Modifier
+                            .scale(scaleCancel)
+                            .then(Modifier),
+                        interactionSourceSave = interactionSourceSave,
+                        interactionSourceCancel = interactionSourceCancel
                     )
                 }
             }
-        } else {
-            Column(
-                modifier = Modifier
-                    .padding(paddingValues)
-                    .fillMaxSize()
-                    .verticalScroll(rememberScrollState())
-                    .padding(24.dp)
-            ) {
-                Text("Añadir Película", style = MaterialTheme.typography.headlineMedium)
-                Spacer(modifier = Modifier.height(16.dp))
-                FormFields(
-                    title = title,
-                    onTitleChange = { title = it },
-                    genre = genre,
-                    onGenreChange = { genre = it },
-                    expandedGenre = expandedGenre,
-                    onExpandedChange = { expandedGenre = it },
-                    genres = genres,
-                    synopsis = synopsis,
-                    onSynopsisChange = { synopsis = it },
-                    duration = duration,
-                    onDurationChange = { duration = it },
-                    director = director,
-                    onDirectorChange = { director = it },
-                    isFavorite = isFavorite,
-                    onFavoriteChange = { isFavorite = it }
-                )
-                Spacer(modifier = Modifier.height(24.dp))
-                FormButtons(
-                    isFormValid = isFormValid,
-                    onSave = {
-                        addEditViewModel.saveMovie(
-                            title = title.trim(),
-                            genre = genre.uppercase(),
-                            synopsis = synopsis.trim(),
-                            duration = duration.toInt(),
-                            director = director.trim(),
-                            isFavorite = isFavorite
-                        )
-                        navController.navigate("main") {
-                            popUpTo("main") { inclusive = true }
-                        }
-                    },
-                    onCancel = {
-                        navController.navigate("main") {
-                            popUpTo("main") { inclusive = true }
-                        }
-                    }
-                )
-            }
         }
     }
 }
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun FormFields(
-    title: String, onTitleChange: (String) -> Unit,
-    genre: String, onGenreChange: (String) -> Unit,
-    expandedGenre: Boolean, onExpandedChange: (Boolean) -> Unit,
-    genres: List<String>,
-    synopsis: String, onSynopsisChange: (String) -> Unit,
-    duration: String, onDurationChange: (String) -> Unit,
-    director: String, onDirectorChange: (String) -> Unit,
-    isFavorite: Boolean, onFavoriteChange: (Boolean) -> Unit
-) {
-    OutlinedTextField(
-        value = title,
-        onValueChange = onTitleChange,
-        label = { Text("Título") },
-        modifier = Modifier.fillMaxWidth()
-    )
-    Spacer(modifier = Modifier.height(8.dp))
-
-    ExposedDropdownMenuBox(
-        expanded = expandedGenre,
-        onExpandedChange = { onExpandedChange(!expandedGenre) }
-    ) {
-        OutlinedTextField(
-            value = genre,
-            onValueChange = {},
-            label = { Text("Género") },
-            readOnly = true,
-            trailingIcon = {
-                ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedGenre)
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .menuAnchor()
-        )
-        ExposedDropdownMenu(
-            expanded = expandedGenre,
-            onDismissRequest = { onExpandedChange(false) }
-        ) {
-            genres.forEach { genreOption ->
-                DropdownMenuItem(
-                    text = { Text(genreOption) },
-                    onClick = {
-                        onGenreChange(genreOption)
-                        onExpandedChange(false)
-                    }
-                )
-            }
-        }
-    }
-
-    Spacer(modifier = Modifier.height(8.dp))
-    OutlinedTextField(
-        value = synopsis,
-        onValueChange = onSynopsisChange,
-        label = { Text("Sinopsis") },
-        modifier = Modifier.fillMaxWidth()
-    )
-    Spacer(modifier = Modifier.height(8.dp))
-    OutlinedTextField(
-        value = duration,
-        onValueChange = { if (it.all { c -> c.isDigit() }) onDurationChange(it) },
-        label = { Text("Duración (min)") },
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-        singleLine = true,
-        modifier = Modifier.fillMaxWidth()
-    )
-    Spacer(modifier = Modifier.height(8.dp))
-    OutlinedTextField(
-        value = director,
-        onValueChange = onDirectorChange,
-        label = { Text("Director") },
-        modifier = Modifier.fillMaxWidth()
-    )
-    Spacer(modifier = Modifier.height(8.dp))
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        Checkbox(checked = isFavorite, onCheckedChange = onFavoriteChange)
-        Spacer(modifier = Modifier.width(8.dp))
-        Text("Marcar como favorita")
-    }
-}
-
-@Composable
-fun FormButtons(isFormValid: Boolean, onSave: () -> Unit, onCancel: () -> Unit) {
-    Row {
-        Button(onClick = onSave, enabled = isFormValid) {
-            Text("Guardar")
-        }
-        Spacer(modifier = Modifier.width(8.dp))
-        OutlinedButton(onClick = onCancel) {
-            Text("Cancelar")
-        }
-    }
-}
-
-
