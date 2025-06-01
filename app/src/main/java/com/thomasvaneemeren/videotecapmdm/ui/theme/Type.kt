@@ -37,7 +37,7 @@ val Typography = Typography(
         fontSize = 14.sp,
         letterSpacing = 0.25.sp
     ),
-    labelSmall = TextStyle(  // Para etiquetas, botones pequeños, etc.
+    labelSmall = TextStyle(  // Para etiquetas, botones pequeños
         fontFamily = FontFamily.Default,
         fontWeight = FontWeight.Medium,
         fontSize = 11.sp,

@@ -24,4 +24,3 @@ interface MovieDao {
     @Delete
     suspend fun delete(movie: MovieEntity)
 }
-

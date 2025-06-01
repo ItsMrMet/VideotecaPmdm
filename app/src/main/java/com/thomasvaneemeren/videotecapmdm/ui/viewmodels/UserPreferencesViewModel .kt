@@ -37,6 +37,3 @@ class UserPreferencesViewModel @Inject constructor(
         }
     }
 }
-
-
-
