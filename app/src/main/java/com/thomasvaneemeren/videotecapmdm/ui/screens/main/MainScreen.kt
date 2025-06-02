@@ -28,6 +28,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.ui.graphics.Color
+import com.thomasvaneemeren.videotecapmdm.ui.theme.FavoriteRed
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -89,7 +90,7 @@ fun MainScreen(
                             Icon(
                                 imageVector = if (favoritesOnly) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
                                 contentDescription = "Mostrar solo favoritos",
-                                tint = if (favoritesOnly) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+                                tint = if (favoritesOnly) FavoriteRed else MaterialTheme.colorScheme.onSurface
                             )
                         }
                     }
@@ -159,7 +160,7 @@ fun MainScreen(
                             Icon(
                                 imageVector = if (favoritesOnly) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
                                 contentDescription = "Mostrar solo favoritos",
-                                tint = if (favoritesOnly) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+                                tint = if (favoritesOnly) FavoriteRed else MaterialTheme.colorScheme.onSurface
                             )
                         }
                     }

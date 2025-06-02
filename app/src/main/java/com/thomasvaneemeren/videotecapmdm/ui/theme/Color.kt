@@ -25,3 +25,6 @@ val OnPrimaryDark = Color(0xFF000000)
 val OnSecondaryDark = Color(0xFF000000)
 val OnBackgroundDark = Color(0xFFE0E0E0)
 val OnSurfaceDark = Color(0xFFE0E0E0)
+
+//Favorite color
+val FavoriteRed = Color(0xFFE53935)

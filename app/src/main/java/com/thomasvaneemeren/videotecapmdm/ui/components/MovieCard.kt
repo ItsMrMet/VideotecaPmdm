@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import com.thomasvaneemeren.videotecapmdm.data.database.entities.MovieEntity
+import com.thomasvaneemeren.videotecapmdm.ui.theme.FavoriteRed
 
 @Composable
 fun MovieCard(
@@ -22,6 +23,8 @@ fun MovieCard(
     modifier: Modifier = Modifier
 ) {
     val isLandscape = LocalConfiguration.current.orientation == android.content.res.Configuration.ORIENTATION_LANDSCAPE
+    val favoriteTint = if (isFavorite) FavoriteRed else MaterialTheme.colorScheme.onSurfaceVariant
+
 
     Card(
         modifier = modifier
@@ -66,7 +69,7 @@ fun MovieCard(
                     Icon(
                         imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
                         contentDescription = if (isFavorite) "Quitar de favoritos" else "Añadir a favoritos",
-                        tint = if (isFavorite) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+                        tint = favoriteTint
                     )
                 }
             }
@@ -83,7 +86,7 @@ fun MovieCard(
                         Icon(
                             imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder,
                             contentDescription = if (isFavorite) "Quitar de favoritos" else "Añadir a favoritos",
-                            tint = if (isFavorite) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant
+                            tint = favoriteTint
                         )
                     }
                 }

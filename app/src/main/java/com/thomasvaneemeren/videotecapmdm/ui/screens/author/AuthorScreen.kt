@@ -68,7 +68,7 @@ fun AuthorScreen(
             )
 
             Text(
-                text = "Desarrollador de la Videoteca PMDM",
+                text = "Desarrollador de la Videoteca Video Corner",
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )

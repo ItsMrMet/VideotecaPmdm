@@ -42,7 +42,7 @@ fun ScaffoldLayout(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Videoteca") },
+                title = { Text("Video Corner") },
                 navigationIcon = navigationIcon,
                 actions = {
                     Column {
